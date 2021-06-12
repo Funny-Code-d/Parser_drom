@@ -16,20 +16,28 @@ def get_html(url, params=None):
 
 # начальный сбор информации
 def get_primary_content(html, city):
+    
     soup = BeautifulSoup(html, "html.parser")
+    
     # поиск таблички каждой машины на странице
-    items = soup.find_all("a", class_="css-1hgk7d1")
+    items = soup.find_all("a", class_="css-ruo0cm")
     for item in items:
         car = {}
         # поиск в табличке машины (марка машины, год, ссылка на объявление, цена)
-        name = item.find('div', class_='eozdvfu0').get_text(strip=True)
-        list_name = name.split(',')
+        # name = item.find('div', class_='eozdvfu0').get_text(strip=True)
+        
         try:
+            name = item.find('div', class_='css-19e84ej').get_text(strip=True)
+            print(name)
+            list_name = name.split(',')
             car['name_car'] = list_name[0]
             car['years'] = int(list_name[1])
             car['href'] = item.get('href')
         except ValueError:
+            print("Error")
             continue
+        except AttributeError:
+            print("Error atribute")
         # поиск цены
         price = item.find('div', class_='css-1dv8s3l').get_text(strip=True)
         price = price.replace("q", "")
@@ -37,6 +45,7 @@ def get_primary_content(html, city):
             price = int(price.replace(' ', ''))
         except ValueError:
             continue
+            print("Error")
         car['price'] = price
         
         # поиск фото
@@ -54,7 +63,9 @@ def get_primary_content(html, city):
                                    price=car['price'],
                                    photo=car['photo'])
         
+        print(car["name_car"], car['price'])
         # Сортировка по директориям
+        
         if 0 < price < 100000:
             with shelve.open("../data_base/" + str(city) + '/0-100/' + str(car['name_car']) + '.db') as file:
                 file[car['href']] = car_object
