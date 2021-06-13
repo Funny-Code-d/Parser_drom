@@ -8,6 +8,9 @@ from time import sleep
 from function_for_parse import *
 
 
+global pause_parse
+pause_parse = 0
+
 
 #------------------------------------------------------------------------------------------------
 def get_missing_info(html, href):
@@ -26,6 +29,7 @@ def get_missing_info(html, href):
 	"url" : href
 	}
 	print(dict_info)
+	#print("Sucsecfull!!")
 	return dict_info
 	
 
@@ -58,10 +62,18 @@ with conn.cursor() as cursor:
 	select = cursor.fetchall()
 
 
-	for item in select:
-		html = get_html(item[0])
-		if html.status_code == 200:
-			dict_miss = get_missing_info(html, str(item[0]))
-			update_records(dict_miss)
+for item in select:
+	html = get_html(item[0])
+	pause_parse += 1
+	if html.status_code == 200:
+		dict_miss = get_missing_info(html, str(item[0]))
+	else:
+		print("jump!!!")
+		continue
+	# 	update_records(dict_miss)
+	# if pause_parse >= 100:
+	# 	pause_parse = 0
+	# 	print("Pause parse 30 sec...")
+	# 	sleep(30)
 		
 			
