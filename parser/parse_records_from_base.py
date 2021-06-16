@@ -28,7 +28,7 @@ def get_missing_info(html, href):
 	"number_view" : number_view,
 	"url" : href
 	}
-	print(dict_info)
+	# print(dict_info)
 	#print("Sucsecfull!!")
 	return dict_info
 	
@@ -63,10 +63,12 @@ with conn.cursor() as cursor:
 
 
 for item in select:
+	print(item[0])
 	html = get_html(item[0])
 	pause_parse += 1
 	if html.status_code == 200:
 		dict_miss = get_missing_info(html, str(item[0]))
+		update_records(dict_miss)
 	else:
 		print("jump!!!")
 		continue

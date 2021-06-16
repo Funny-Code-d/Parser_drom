@@ -85,7 +85,7 @@ def get_field_pages(html, city):
 # Функция для парса по городу и ценовому диапазону
 def parse(number_page, city, categories):
 	for  page in range(1, number_page + 1):
-		html = get_html("https://" + str(city) + ".drom.ru/auto/all/page" + str(page) + '/?minprice=' + str(categories[0]) + '&maxprice=' + str(categories[1]))
+		html = get_html()
 		if html.status_code == 200:
 			get_field_pages(html.text, city)
 

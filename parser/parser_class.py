@@ -1,48 +1,98 @@
 import requests
+from bs4 import BeautifulSoup
+from bs4.element import AttributeValueWithCharsetSubstitution
 class Parser:
 	"""
 	Класс для сбора информации с сайта Drom.ru
-	Сбор информации происходит по городам и ценовым диапазонам
-	Количество ценовых диапазонов = 6
-	-------------------------------------------------
-	Пример:
-		Количество городов = 3
-		Количество страниц для каждой категории = 10
-		Количество объявлений на странице = 20
 
-		Парсер выдаст 3600 объявлений
-	--------------------------------------------------
-
-
-	Парамеры при создании экземпляра:
-	city - город(а) для сбора информации (можно передать как строку, так и список)
-	number_pages - количество страниц сбора информации в каждой категории
 	"""
-	def __init__(self, city, number_pages):
+	def __init__(self):
 		self.HEADER = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0', 'accept' : '*/*'}
-		self.categories = ['0-100', '100-200', '200-500', '500-900', '900-1500', '1500-2000']
-		self.city = city
-		self.number_pages = number_pages
-		self.url = 'https://auto.drom.ru/all/'
 
-	def get_url(self, page, min_price, max_price):
-		"""Метод для формирования правильного URL (с учётом номера страницы и ценового диапазона)
-
-		Параметры:
-		page - Номер страницы
-		min_price - Минимальная цена
-		max_price - Максимальная цена
-
-		Возвращает URL ссылку
-		"""
-		final_url = self.url + 'page' + page + '/?minprice=' + min_price + '&maxprice=' + max_price
-		return final_url
-
-	def get_html(self, page, min_price, max_price, params=None):
+	def get_html_text(self, url, params=None):
 		"""
 		Метод для отправки запроса на получение страницы
-		Возвращает html страницу
+		Возвращает html_text страницы
 		"""
-		r = requests.get(get_url(page, min_price, max_price), headers=HEADERS, param=params)
-		return r
-        
+		proxies = {
+		# "https" : "91.227.45.220:8080",
+		# "http" : '46.42.16.245:31565',
+		"socks4" : "188.235.34.146:1080"
+		}
+		r = requests.get(url, headers=self.HEADER, params=params, proxies=proxies)
+		soup = BeautifulSoup(r.text, 'html.parser')
+		return soup
+
+
+	def get_info_fields(self, url, city):
+		"""Метод для получения информации об обявлениях со страницы
+
+		Параметры:
+		url - Ссылка на страницу
+		city - Город
+
+		Возвращает словарь"""
+		html = self.get_html_text(url)
+		# Получение табличек объявлений
+		fields = html.find_all('a', class_='ewrty960')
+		iteration = 1
+		return_dict = {}
+		for item in fields:
+			model_car = item.find("span", {"data-ftid":"bull_title"}).get_text(strip=True)
+			list_name = model_car.split(',')
+			model_car = list_name[0]
+			href = item.get("href")
+			price = item.find("span", {"data-ftid":"bull_price"}).get_text(strip=True)
+			list_price = price.split(' ')
+			price = ''
+			for i in list_price:
+				price += i
+			if 0 < int(price) <= 100000:
+				average_price = '0-100'
+			elif 100000 < int(price) <= 200000:
+				average_price = '100-200'
+			elif 200000 < int(price) <= 500000:
+				average_price = '200-500'
+			elif 500000 < int(price) <= 900000:
+				average_price = '500-900'
+			elif 900000 < int(price) <= 1500000:
+				average_price = '900-1500'
+			elif 1500000 < int(price) <= 2000000:
+				average_price = '1500-2000'
+			else:
+				average_price = '2000-...'
+
+			return_dict[iteration] = {
+			"model_car" : model_car,
+			"url" : href,
+			"price" : price,
+			"average_price" : average_price,
+			"city" : city
+			}
+			iteration += 1
+		return return_dict
+
+	def get_info_page_field(self, url):
+		"""
+		Медот для извлечения информации со страницы объявления
+
+		Параметры:
+		url - Ссылка на страницу
+
+		Возвращает словарь с данными (date_publication, number_view, url)
+		"""
+		html = self.get_html_text(url)
+
+		number_view = int(html.find("div", class_="css-se5ay5").get_text(strip=True))
+		date_text = html.find("div", class_="css-61s82p").get_text(strip=True)
+		# Извлечение даты из декста
+		list_date = date_text.split(' ')
+		date_pub = list_date[-1].split('.')
+		date_publication = date_pub[2] + '-' + date_pub[1] + '-' + date_pub[0]
+		# Словарь с извлечёнными данными
+		dict_info = {
+		"date_publication" : date_publication,
+		"number_view" : number_view,
+		"url" : url
+		}
+		return dict_info
