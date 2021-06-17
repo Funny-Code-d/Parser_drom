@@ -62,12 +62,13 @@ def get_field_pages(html, city):
 			
 			# Вызов функции для получения информации из таблички (Одной)
 			dict_info = get_info_from_field(item, city)
+			print(dict_info)
 
 			select = sql.SQL("SELECT url, model FROM advertisement WHERE url = %s AND model = %s")
 			cursor.execute(select, (dict_info['href'], dict_info['name_car']))
 			# Запись полученной таблицы в переменную
 			list_from_select = cursor.fetchall()
-			print(list_from_select)
+			#print(list_from_select)
 
 			# Если такой записи нет в базе
 			if  len(list_from_select) == 0:
@@ -76,7 +77,8 @@ def get_field_pages(html, city):
 				cursor.execute(insert, (dict_info['city'], dict_info['average_price'], dict_info['price'], dict_info['href'], dict_info['name_car']))
 			# Иначе если есть
 			else:
-				print("Запись есть")
+				pass
+				#print("Запись есть")
 			# #insert = sql.SQL("INSERT INTO advertisement (city, price_range, price, url, model) VALUES (%s, %s, %s, %s, %s)")
 			#cursor.execute(insert, (city, average_price, price, href, name,))
 
@@ -85,7 +87,7 @@ def get_field_pages(html, city):
 # Функция для парса по городу и ценовому диапазону
 def parse(number_page, city, categories):
 	for  page in range(1, number_page + 1):
-		html = get_html()
+		html = get_html("https://" + city + ".drom.ru/auto/all/page" + str(number_page) + "/?minprice=" + str(categories[0]) + "&maxprice=" + str(categories[1]))
 		if html.status_code == 200:
 			get_field_pages(html.text, city)
 
@@ -96,7 +98,7 @@ def main(city_n):
 		categories = [ [0, 100000], [100000, 200000], [200000, 500000], [500000, 900000], [900000, 1500000], [1500000, 2000000] ]
 
 		for categ in categories:
-			parse(10, city, categ)
+			parse(50, city, categ)
 
 
 

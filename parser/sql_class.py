@@ -40,7 +40,7 @@ class SQL_request:
 		self.conn.close()
 		print("Close connect to db")
 # --------------------------------------------------------------------------------------------------------------
-	def select_url(self, table_name):
+	def select_url(self):
 
 		"""Метод для получения таблицы URL адресов
 
@@ -49,8 +49,8 @@ class SQL_request:
 		Возвращает таблицу"""
 
 		self.cursor = self.conn.cursor()
-		select = """SELECT url FROM %s"""
-		self.cursor.execute(select, (table_name, ))
+		select = """SELECT url FROM advertisement"""
+		self.cursor.execute(select, ())
 		return_list = self.cursor.fetchall()
 		self.cursor.close()
 		return return_list
@@ -68,8 +68,8 @@ class SQL_request:
 		"""
 
 		self.cursor = self.conn.cursor()
-		select = """SELECT url, model FROM %s WHERE url = %s AND model = %s"""
-		self.cursor.execute(select, (table_name, check_url, check_model))
+		select = """SELECT url, model FROM advertisement WHERE url = %s AND model = %s"""
+		self.cursor.execute(select, (check_url, check_model))
 
 		answer = self.cursor.fetchall()
 		self.cursor.close()
@@ -94,6 +94,7 @@ class SQL_request:
 		
 		insert = """INSERT INTO advertisement (city, price_range, price, url, model) VALUES (%s, %s, %s, %s, %s)"""
 		self.cursor.execute(insert, (city, average_price, price, url, model))
+		print(url)
 		print("Запись добавлена")
 		self.cursor.close()
 # --------------------------------------------------------------------------------------------------------------

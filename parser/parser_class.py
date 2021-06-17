@@ -16,8 +16,8 @@ class Parser:
 		"""
 		proxies = {
 		# "https" : "91.227.45.220:8080",
-		# "http" : '46.42.16.245:31565',
-		"socks4" : "188.235.34.146:1080"
+		"http" : '46.42.16.245:31565',
+		# "socks4" : "188.235.34.146:1080"
 		}
 		r = requests.get(url, headers=self.HEADER, params=params, proxies=proxies)
 		soup = BeautifulSoup(r.text, 'html.parser')
