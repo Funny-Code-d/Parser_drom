@@ -11,13 +11,16 @@ for c in city:
 		for page in range(1, 50):
 			url = "https://" + c + ".drom.ru/auto/all/page" + str(page) + "/?minprice=" + str(categ[0]) + "&maxprice=" + str(categ[1])
 			dict_car = parser.get_info_fields(url, c)
-			for car in dict_car.keys():
-				ones_ob = dict_car[car]
-				check_record = sql.check_record_in_db('advertisement', ones_ob['url'], ones_ob['model_car'])
-				if check_record:
-					#Запись есть
-					print("Запись существует")
-				else:
-					# Новая запись
-					sql.insert_primary_info(ones_ob['city'], ones_ob['average_price'], ones_ob['price'], ones_ob['url'], ones_ob['model_car'])
+			if dict_car == "delete":
+				pass
+			else:
+				for car in dict_car.keys():
+					ones_ob = dict_car[car]
+					check_record = sql.check_record_in_db('advertisement', ones_ob['url'], ones_ob['model_car'])
+					if check_record:
+						#Запись есть
+						print("Запись существует")
+					else:
+						# Новая запись
+						sql.insert_primary_info(ones_ob['city'], ones_ob['average_price'], ones_ob['price'], ones_ob['url'], ones_ob['model_car'])
 

@@ -49,7 +49,7 @@ class SQL_request:
 		Возвращает таблицу"""
 
 		self.cursor = self.conn.cursor()
-		select = """SELECT url FROM advertisement"""
+		select = """SELECT url FROM advertisement WHERE number_view = 0"""
 		self.cursor.execute(select, ())
 		return_list = self.cursor.fetchall()
 		self.cursor.close()
@@ -118,3 +118,15 @@ class SQL_request:
 			print("Error dataBase")
 		else:
 			print("Запись обновлена")
+# --------------------------------------------------------------------------------------------------------------
+	def delete_url(self, url):
+		try:
+			self.cursor = self.conn.cursor()
+
+			delete = """DELETE FROM advertisement WHERE url = %s"""
+			self.cursor.execute(delete, (url))
+			self.cursor.close()
+		except (Exception, psycopg2.DatabaseError) as error:
+			print("Error dataBase")
+		else:
+			print("Запись удалена")
