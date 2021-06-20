@@ -49,7 +49,7 @@ class SQL_request:
 		Возвращает таблицу"""
 
 		self.cursor = self.conn.cursor()
-		select = """SELECT url FROM advertisement WHERE number_view = 0"""
+		select = """SELECT url FROM advertisement WHERE number_view[2] = 0"""
 		self.cursor.execute(select, ())
 		return_list = self.cursor.fetchall()
 		self.cursor.close()
@@ -92,7 +92,7 @@ class SQL_request:
 
 		self.cursor = self.conn.cursor()
 		
-		insert = """INSERT INTO advertisement (city, price_range, price, url, model) VALUES (%s, %s, %s, %s, %s)"""
+		insert = """INSERT INTO advertisement (city, price_range, price, url, model, number_view) VALUES (%s, %s, %s, %s, %s, '{ 0, 0 }')"""
 		self.cursor.execute(insert, (city, average_price, price, url, model))
 		print(url)
 		print("Запись добавлена")
@@ -111,7 +111,7 @@ class SQL_request:
 		try:
 			self.cursor = self.conn.cursor()
 
-			update = """UPDATE advertisement SET date_publication = %s, number_view = %s WHERE url = %s"""
+			update = """UPDATE advertisement SET date_publication = %s, number_view[2] = %s WHERE url = %s"""
 			self.cursor.execute(update, (date_publication, number_view, url))
 			self.cursor.close()
 		except (Exception, psycopg2.DatabaseError) as error:
@@ -130,3 +130,24 @@ class SQL_request:
 			print("Error dataBase")
 		else:
 			print("Запись удалена")
+# --------------------------------------------------------------------------------------------------------------
+	def before_update(self):
+		"""
+		Метод для обработки таблицы
+		В случае ошибки при дополнении таблицы датой публикации и количеством просмотов,
+		можно будет определить на каком объявлении остановилась программа
+
+		Изменяется массив number_view: на первое место ставиться старое количество просмотров,
+		на второе место ставиться ноль.
+		"""
+		zero = """UPDATE advertisement SET number_view[1] = number_view[2], number_view[2] = 0"""
+		try:
+			self.cursor = self.conn.cursor()
+
+			self.cursor.execute(zero, ())
+			self.cursor.close()
+		except (Exception, psycopg2.DatabaseError) as error:
+			print("Error db")
+			print(error)
+		else:
+			print("База обновлена")
