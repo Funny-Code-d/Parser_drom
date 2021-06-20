@@ -5,7 +5,7 @@ import datetime
 # Создание объектов
 parser = parser_class.Parser()
 sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
-sql.before_update()
+#sql.before_update()
 # Запрос на получение всех url адресов из таблицы
 table = sql.select_url()
 # Парс каждого объявления по отдельноси
