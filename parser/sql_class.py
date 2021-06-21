@@ -124,7 +124,7 @@ class SQL_request:
 			self.cursor = self.conn.cursor()
 
 			delete = """DELETE FROM advertisement WHERE url = %s"""
-			self.cursor.execute(delete, (url))
+			self.cursor.execute(delete, (url,))
 			self.cursor.close()
 		except (Exception, psycopg2.DatabaseError) as error:
 			print("Error dataBase")
