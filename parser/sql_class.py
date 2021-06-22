@@ -94,8 +94,8 @@ class SQL_request:
 		
 		insert = """INSERT INTO advertisement (city, price_range, price, url, model, number_view) VALUES (%s, %s, %s, %s, %s, '{ 0, 0 }')"""
 		self.cursor.execute(insert, (city, average_price, price, url, model))
-		print(url)
-		print("Запись добавлена")
+		#print(url)
+		#print("Запись добавлена")
 		self.cursor.close()
 # --------------------------------------------------------------------------------------------------------------
 	def update_info(self, number_view, date_publication, url):
@@ -117,7 +117,8 @@ class SQL_request:
 		except (Exception, psycopg2.DatabaseError) as error:
 			print("Error dataBase")
 		else:
-			print("Запись обновлена")
+			#print("Запись обновлена")
+			pass
 # --------------------------------------------------------------------------------------------------------------
 	def delete_url(self, url):
 		try:
@@ -129,7 +130,8 @@ class SQL_request:
 		except (Exception, psycopg2.DatabaseError) as error:
 			print("Error dataBase")
 		else:
-			print("Запись удалена")
+			#print("Запись удалена")
+			pass
 # --------------------------------------------------------------------------------------------------------------
 	def before_update(self):
 		"""
@@ -150,4 +152,8 @@ class SQL_request:
 			print("Error db")
 			print(error)
 		else:
-			print("База обновлена")
+			#print("База обновлена")
+			pass
+# --------------------------------------------------------------------------------------------------------------
+	def overflow_test(self):
+		pass

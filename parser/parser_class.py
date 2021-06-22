@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import AttributeValueWithCharsetSubstitution
+from requests.packages import urllib3
+
+
 class Parser:
 	"""
 	Класс для сбора информации с сайта Drom.ru
@@ -20,13 +23,12 @@ class Parser:
 		"socks4" : "188.235.34.146:1080",
 		"socks5" : "192.111.137.37:18762"
 		}
-		r = requests.get(url, headers=self.HEADER, params=params, proxies=proxies)
-		print("Status code {}".format(r.status_code))
+		urllib3.disable_warnings()
+		r = requests.get(url, headers=self.HEADER, params=params, proxies=proxies, verify=False)
 		if r.status_code == 200:
 			soup = BeautifulSoup(r.text, 'html.parser')
 			return soup
 		elif r.status_code == 404:
-			print("404!!!")
 			return "PAGE NOT FOUND"
 		else:
 			return "Undefined code"
@@ -99,22 +101,22 @@ class Parser:
 		elif html == 'Undefined code':
 			pass
 		else:
-                        try:
-                            check_delete_page = html.find("h1", class_="css-cgwg2n").get_text(strip=True)
-                            if check_delete_page == 'Объявление удалено!':
-                                return "delete"
-                        except AttributeError:
-                            print("error check delete")
-                        number_view = int(html.find("div", class_="css-se5ay5").get_text(strip=True))
-                        date_text = html.find("div", class_="css-61s82p").get_text(strip=True)
-                        # Извлечение даты из декста
-                        list_date = date_text.split(' ')
-                        date_pub = list_date[-1].split('.')
-                        date_publication = date_pub[2] + '-' + date_pub[1] + '-' + date_pub[0]
-                        # Словарь с извлечёнными данными
-                        dict_info = {
-                        "date_publication" : date_publication,
-                        "number_view" : number_view,
-                        "url" : url
-                        }
-                        return dict_info
+			try:
+			    check_delete_page = html.find("h1", class_="css-cgwg2n").get_text(strip=True)
+			    if check_delete_page == 'Объявление удалено!':
+			        return "delete"
+			except AttributeError:
+			    print("error check delete")
+			number_view = int(html.find("div", class_="css-se5ay5").get_text(strip=True))
+			date_text = html.find("div", class_="css-61s82p").get_text(strip=True)
+			# Извлечение даты из декста
+			list_date = date_text.split(' ')
+			date_pub = list_date[-1].split('.')
+			date_publication = date_pub[2] + '-' + date_pub[1] + '-' + date_pub[0]
+			# Словарь с извлечёнными данными
+			dict_info = {
+			"date_publication" : date_publication,
+			"number_view" : number_view,
+			"url" : url
+			}
+			return dict_info
