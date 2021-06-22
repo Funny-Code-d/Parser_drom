@@ -156,4 +156,34 @@ class SQL_request:
 			pass
 # --------------------------------------------------------------------------------------------------------------
 	def overflow_test(self):
-		pass
+		"""
+		Метод для чистки базы, допускается до 100 объявлений по каждой марке
+		При переполнении удаляются объявления с самой давней датой публикации
+		"""
+		get_table_model = """
+		SELECT model, count(*) FROM advertisement
+		GROUP BY model ORDER BY count DESC
+		"""
+
+		try:
+			self.cursor = self.conn.cursor()
+
+			self.cursor.execute(get_table_model, ())
+			return_dict = self.cursor.fetchall()
+			self.cursor.close()
+		except (Exception, psycopg2.DatabaseError) as error:
+			print("Error")
+		
+		for item in return_dict:
+			model = item[0]
+			number_pub = item[1]
+
+			if number_pub > 100:
+				pub_requests = """SELECT url, model, date_publication FROM advertisement WHERE model = %s ORDER BY date_publication"""
+				self.cursor = self.conn.cursor()
+				self.cursor.execute(pub_requests, (model, ))
+				table_pub = self.cursor.fetchall()
+				self.cursor.close()
+				range_del = len(table_pub) - 100
+				for i in range(range_del):
+					self.delete_url(table_pub[i][0])
