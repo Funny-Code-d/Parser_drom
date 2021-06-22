@@ -178,12 +178,12 @@ class SQL_request:
 			model = item[0]
 			number_pub = item[1]
 
-			if number_pub > 100:
+			if number_pub > 300:
 				pub_requests = """SELECT url, model, date_publication FROM advertisement WHERE model = %s ORDER BY date_publication"""
 				self.cursor = self.conn.cursor()
 				self.cursor.execute(pub_requests, (model, ))
 				table_pub = self.cursor.fetchall()
 				self.cursor.close()
-				range_del = len(table_pub) - 100
+				range_del = len(table_pub) - 300
 				for i in range(range_del):
 					self.delete_url(table_pub[i][0])
