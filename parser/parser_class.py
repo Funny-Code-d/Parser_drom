@@ -8,6 +8,8 @@ class Parser:
 	"""
 	Класс для сбора информации с сайта Drom.ru
 
+	Параметры: ---
+
 	"""
 	def __init__(self):
 		self.HEADER = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0', 'accept' : '*/*'}
@@ -15,7 +17,7 @@ class Parser:
 	def get_html_text(self, url, params=None):
 		"""
 		Метод для отправки запроса на получение страницы
-		Возвращает html_text страницы
+		Возвращает объект класса BeautifulSoup
 		"""
 		proxies = {
 		# "https" : "178.32.116.64:3128",
@@ -41,7 +43,7 @@ class Parser:
 		url - Ссылка на страницу
 		city - Город
 
-		Возвращает словарь"""
+		Возвращает словарь {model_car, url, price, average_price, city}"""
 		html = self.get_html_text(url)
 		if html == "PAGE NOT FOUND":
 			return "delete"
@@ -92,7 +94,7 @@ class Parser:
 		Параметры:
 		url - Ссылка на страницу
 
-		Возвращает словарь с данными (date_publication, number_view, url)
+		Возвращает словарь с данными {date_publication, number_view, url}
 		"""
 		html = self.get_html_text(url)
 
@@ -107,7 +109,7 @@ class Parser:
 			        return "delete"
 			except AttributeError:
 			    print("error check delete")
-			number_view = int(html.find("div", class_="css-se5ay5").get_text(strip=True))
+			number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
 			date_text = html.find("div", class_="css-61s82p").get_text(strip=True)
 			# Извлечение даты из декста
 			list_date = date_text.split(' ')
