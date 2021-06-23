@@ -117,7 +117,7 @@ class SQL_request:
 		except (Exception, psycopg2.DatabaseError) as error:
 			print("Error dataBase")
 		else:
-			#print("Запись обновлена")
+			# print("Запись обновлена")
 			pass
 # --------------------------------------------------------------------------------------------------------------
 	def delete_url(self, url):

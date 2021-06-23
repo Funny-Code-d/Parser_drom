@@ -46,6 +46,7 @@ class Parser:
 		Возвращает словарь {model_car, url, price, average_price, city}"""
 		html = self.get_html_text(url)
 		if html == "PAGE NOT FOUND":
+			print("Удаляю")
 			return "delete"
 		else:
 			# Получение табличек объявлений
@@ -108,7 +109,7 @@ class Parser:
 			    if check_delete_page == 'Объявление удалено!':
 			        return "delete"
 			except AttributeError:
-			    print("error check delete")
+			    pass
 			number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
 			date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
 			# Извлечение даты из декста

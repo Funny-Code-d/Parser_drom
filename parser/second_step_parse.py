@@ -23,7 +23,6 @@ for item in table:
 	if dict_info == "delete":
 		sql.delete_url(item[0])
 	else:
-
 		sql.update_info(dict_info['number_view'], dict_info['date_publication'], dict_info['url'])
 
 	#print("Осталось {} объявлений".format(process))
