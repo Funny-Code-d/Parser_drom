@@ -110,7 +110,7 @@ class Parser:
 			except AttributeError:
 			    print("error check delete")
 			number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
-			date_text = html.find("div", class_="css-61s82p").get_text(strip=True)
+			date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
 			# Извлечение даты из декста
 			list_date = date_text.split(' ')
 			date_pub = list_date[-1].split('.')
