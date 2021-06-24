@@ -18,6 +18,7 @@ for c in city:
 		for page in range(1, pages):
 			url = "https://" + c + ".drom.ru/auto/all/page" + str(page) + "/?minprice=" + str(categ[0]) + "&maxprice=" + str(categ[1])
 			dict_car = parser.get_info_fields(url, c)
+
 			# Вывод Процесса
 			process_index += 1
 			process_index_print += 1

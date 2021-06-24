@@ -40,6 +40,16 @@ class SQL_request:
 		self.conn.close()
 		print("Close connect to db  ")
 # --------------------------------------------------------------------------------------------------------------
+	def request_to_db(self, req):
+		try:
+			self.cursor = self.conn.cursor()
+			self.cursor.execute(req, ())
+			return_obj = self.cursor.fetchall()
+			self.cursor.close()
+		except (Exception, psycopg2.DatabaseError) as error:
+			print(error)
+		return return_obj
+# --------------------------------------------------------------------------------------------------------------
 	def select_url(self):
 
 		"""Метод для получения таблицы URL адресов
@@ -193,3 +203,24 @@ class SQL_request:
 				range_del = len(table_pub) - 300
 				for i in range(range_del):
 					self.delete_url(table_pub[i][0])
+# --------------------------------------------------------------------------------------------------------------
+
+	def select_model(self):
+
+		select = f"""SELECT model, count(*) FROM advertisement GROUP BY model ORDER BY count"""
+		return self.request_to_db(select)
+
+	def select_for_analysis(self, model):
+
+		select = '''SELECT date_publication, number_view FROM advertisement WHERE model = %s'''
+		try:
+			self.cursor = self.conn.cursor()
+			self.cursor.execute(select, (model, ))
+			return self.cursor.fetchall()
+			self.cursor.close()
+		except (Exception, psycopg2.DatabaseError) as error:
+			print(error)
+
+	def insert_after_analisis(self):
+
+		insert = """INSERT INTO rating (date_rating, place, average_view, model) VALUES (%s, %s, %s, %s)"""

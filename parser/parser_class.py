@@ -50,7 +50,7 @@ class Parser:
 			return "delete"
 		else:
 			# Получение табличек объявлений
-			fields = html.find_all('a', class_='ewrty960')
+			fields = html.find_all('a', class_='ewrty961')
 			iteration = 1
 			return_dict = {}
 			for item in fields:
