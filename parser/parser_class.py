@@ -105,7 +105,7 @@ class Parser:
 			pass
 		else:
 			try:
-			    check_delete_page = html.find("h1", class_="css-cgwg2n").get_text(strip=True)
+			    check_delete_page = html.find("h1", class_="e18vbajn0").get_text(strip=True)
 			    if check_delete_page == 'Объявление удалено!':
 			        return "delete"
 			except AttributeError:
