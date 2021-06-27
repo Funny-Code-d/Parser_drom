@@ -31,5 +31,6 @@ for item in table_model:
 	average_view /= number_pub_model
 	rating[model] = average_view
 df = pd.DataFrame(rating.values(), index = rating.keys(), columns=['Average view'])
-test = df.sort_values(['Average view'], ascending=[False])
-print(test)
+rating = df.sort_values(['Average view'], ascending=[False])
+for car in rating:
+	print(car)

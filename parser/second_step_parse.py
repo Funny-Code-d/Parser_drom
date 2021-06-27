@@ -4,7 +4,7 @@ from time import sleep
 import datetime
 # Создание объектов
 parser = parser_class.Parser()
-sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
+sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "192.168.0.200")
 #sql.before_update()
 # Запрос на получение всех url адресов из таблицы
 table = sql.select_url()

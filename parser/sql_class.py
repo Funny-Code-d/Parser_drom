@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2 import sql
-
+import datetime
 
 class SQL_request:
 
@@ -221,6 +221,18 @@ class SQL_request:
 		except (Exception, psycopg2.DatabaseError) as error:
 			print(error)
 
-	def insert_after_analisis(self):
+	def insert_after_analisis(self, place, model, average_price):
+		now = datetime.datetime.now()
+		day = now.day
+		month = now.month
+		year = now.year
+		date = f"{year}-{month}-{day}"
 
 		insert = """INSERT INTO rating (date_rating, place, average_view, model) VALUES (%s, %s, %s, %s)"""
+
+		try:
+			self.cursor = self.conn.cursor()
+			self.cursor.execute(insert, (date, place, average_price, model))
+			self.cursor.close()
+		except (Exception, psycopg2.DatabaseError) as error:
+			print(error)

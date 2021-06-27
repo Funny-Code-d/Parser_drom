@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from bs4.element import AttributeValueWithCharsetSubstitution
 from requests.packages import urllib3
-
+import os
 
 class Parser:
 	"""
@@ -97,29 +97,37 @@ class Parser:
 
 		Возвращает словарь с данными {date_publication, number_view, url}
 		"""
-		html = self.get_html_text(url)
+		flag = True
+		while flag:
+			flag = False
+			html = self.get_html_text(url)
 
-		if html == "PAGE NOT FOUND":
-			return "delete"
-		elif html == 'Undefined code':
-			pass
-		else:
-			try:
-			    check_delete_page = html.find("h1", class_="e18vbajn0").get_text(strip=True)
-			    if check_delete_page == 'Объявление удалено!':
-			        return "delete"
-			except AttributeError:
-			    pass
-			number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
-			date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
-			# Извлечение даты из декста
-			list_date = date_text.split(' ')
-			date_pub = list_date[-1].split('.')
-			date_publication = date_pub[2] + '-' + date_pub[1] + '-' + date_pub[0]
-			# Словарь с извлечёнными данными
-			dict_info = {
-			"date_publication" : date_publication,
-			"number_view" : number_view,
-			"url" : url
-			}
-			return dict_info
+			if html == "PAGE NOT FOUND":
+				return "delete"
+			elif html == 'Undefined code':
+				pass
+			else:
+				try:
+				    check_delete_page = html.find("h1", class_="e18vbajn0").get_text(strip=True)
+				    if check_delete_page == 'Объявление удалено!':
+				        return "delete"
+				except AttributeError:
+				    pass
+				try:
+					number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
+				except AttributeError:
+					os.system(f"echo {url} >> log.txt")
+					flag = True
+					continue
+				date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
+				# Извлечение даты из декста
+				list_date = date_text.split(' ')
+				date_pub = list_date[-1].split('.')
+				date_publication = date_pub[2] + '-' + date_pub[1] + '-' + date_pub[0]
+				# Словарь с извлечёнными данными
+				dict_info = {
+				"date_publication" : date_publication,
+				"number_view" : number_view,
+				"url" : url
+				}
+				return dict_info
