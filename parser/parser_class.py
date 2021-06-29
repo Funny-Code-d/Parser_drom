@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from bs4.element import AttributeValueWithCharsetSubstitution
 from requests.packages import urllib3
 import os
-
+from loguru import logger
 class Parser:
 	"""
 	Класс для сбора информации с сайта Drom.ru
@@ -97,6 +97,7 @@ class Parser:
 
 		Возвращает словарь с данными {date_publication, number_view, url}
 		"""
+		logger.add("Errors.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 MB")
 		flag = True
 		while flag:
 			flag = False
@@ -115,8 +116,8 @@ class Parser:
 				    pass
 				try:
 					number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
-				except AttributeError:
-					os.system(f"echo {url} >> log.txt")
+				except AttributeError as error_atr:
+					logger.error(error_atr)
 					flag = True
 					continue
 				date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
