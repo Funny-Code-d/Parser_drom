@@ -1,6 +1,6 @@
 import parser_class
 import sql_class
-
+from loguru import logger
 
 """
 Программа для сбора данных с сайта drom.ru и записи в базу
@@ -24,7 +24,8 @@ class Program:
 		self.city = ['novosibirsk', 'irkutsk', 'moscow', 'spb']
 		self.categories = [[0, 100000], [100000, 200000], [200000, 500000], [500000, 900000], [900000, 1500000], [1500000, 2000000]]
 
-		self.number_pages = 50
+		self.number_pages = 1
+		logger.add("debug.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 KB")
 
 
 	def process_monitoring(self, index, len_index):
@@ -32,13 +33,11 @@ class Program:
 			x = int(index / len_index * 100)
 		except ZeroDivisionError:
 			x = 0
-		if x == 100:
-			print("-----Successfully completed-----")
+
+		if index % 2 == 0:
+			print(f"{x}% --- ({index} in {len_index})", end='\r')
 		else:
-			if index % 2 == 0:
-				print(f"{x}% --- ({index} in {len_index})", end='\r')
-			else:
-				print(f"{x}% ||| ({index} in {len_index})", end='\r')
+			print(f"{x}% ||| ({index} in {len_index})", end='\r')
 
 
 	def insert_filed_to_base(self, dict_info_car):
@@ -91,7 +90,6 @@ class Program:
 					# Отображение хода выполенния
 					self.process_monitoring(index, len_index)
 					index += 1
-		self.process_monitoring(len_index, len_index)
 
 	def second_step_parse(self):
 		"""
@@ -118,15 +116,28 @@ class Program:
 			# Отображение хода выполения
 			self.process_monitoring(index, len_index)
 			index += 1
-		self.process_monitoring(len_index, len_index)
+
+
+	def try_second_step_parse(self):
+		flag = True
+		while flag:
+			flag = False
+			try:
+				self.second_step_parse()
+			except (OSError, urllib3.exceptions.NewConnectionError, urllib3.exceptions.MaxRetryError, requests.exceptions.ConnectionError) as error_atr:
+				flag = True
+				continue
 
 	def run(self):
 		print("First step parse:")
 		self.first_step_parse()
-
+		logger.info("First step parse Successfully completed")
 		self.sql.before_update()
-		print("Second step parse:")
-		self.second_step_parse()
+
+		print("Second step parse: ")
+		self.try_second_step_parse()
+		logger.info("Second step parse Successfully completed")
+
 
 
 if __name__ == "__main__":
