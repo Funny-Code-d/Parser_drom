@@ -17,6 +17,10 @@
 
 <h1 align="center">Что нужно для запуска</h1>
 
+## Можно запускать в Docker
+
+    sudo docker build -t parser .
+    sudo docker run --net=host --rm --name parser_program parser
 
 ## Класс "parser" для сбора информации с сайта
 Для запроса страницы с сервера используется модуль requests
