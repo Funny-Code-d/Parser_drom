@@ -1,7 +1,7 @@
 import parser_class
 import sql_class
 from loguru import logger
-
+from requests.packages import urllib3
 """
 Программа для сбора данных с сайта drom.ru и записи в базу
 Автор: Соснин Д.
