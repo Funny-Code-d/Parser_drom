@@ -126,6 +126,7 @@ class Program:
 				self.second_step_parse()
 			except (OSError, urllib3.exceptions.NewConnectionError, urllib3.exceptions.MaxRetryError, requests.exceptions.ConnectionError) as error_atr:
 				flag = True
+				print("While try")
 				continue
 
 	def run(self):
