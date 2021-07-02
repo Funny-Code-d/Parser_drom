@@ -221,18 +221,17 @@ class SQL_request:
 		except (Exception, psycopg2.DatabaseError) as error:
 			print(error)
 
-	def insert_after_analisis(self, place, model, average_price):
+	def insert_after_analisis(self, table, place, model, average_price):
 		now = datetime.datetime.now()
 		day = now.day
 		month = now.month
 		year = now.year
 		date = f"{year}-{month}-{day}"
+		
+		insert = f"""INSERT INTO {table} (date_rating, place, average_view, model) VALUES ({date}, {place}, {average_price}, {model})"""
+		self.request_to_db(insert)
+#-----------------------------------------------------------------------------------------------------------------------
+	def select_for_telegram(self, start):
+		pass
 
-		insert = """INSERT INTO rating (date_rating, place, average_view, model) VALUES (%s, %s, %s, %s)"""
 
-		try:
-			self.cursor = self.conn.cursor()
-			self.cursor.execute(insert, (date, place, average_price, model))
-			self.cursor.close()
-		except (Exception, psycopg2.DatabaseError) as error:
-			print(error)

@@ -1,7 +1,8 @@
 import parser_class
 import sql_class
-from loguru import logger
+import os
 from requests.packages import urllib3
+import requests
 """
 Программа для сбора данных с сайта drom.ru и записи в базу
 Автор: Соснин Д.
@@ -18,14 +19,14 @@ class Program:
 	Параметров для создания экземпляра не требуется
 	"""
 	def __init__(self):
-		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
+		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "192.168.0.200")
 		self.parser = parser_class.Parser()
 
 		self.city = ['novosibirsk', 'irkutsk', 'moscow', 'spb']
 		self.categories = [[0, 100000], [100000, 200000], [200000, 500000], [500000, 900000], [900000, 1500000], [1500000, 2000000]]
 
 		self.number_pages = 1
-		logger.add("debug.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 KB")
+		#logger.add("debug.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 KB")
 
 
 	def process_monitoring(self, index, len_index):
@@ -124,20 +125,20 @@ class Program:
 			flag = False
 			try:
 				self.second_step_parse()
-			except (OSError, urllib3.exceptions.NewConnectionError, urllib3.exceptions.MaxRetryError, requests.exceptions.ConnectionError) as error_atr:
+			except (BaseError) as error_atr:
 				flag = True
-				print("While try")
+				print(error_atr)
 				continue
 
 	def run(self):
-		print("First step parse:")
-		self.first_step_parse()
-		logger.info("First step parse Successfully completed")
-		self.sql.before_update()
+		#print("First step parse:")
+		#self.first_step_parse()
+		#logger.info("First step parse Successfully completed")
+		#self.sql.before_update()
 
 		print("Second step parse: ")
 		self.try_second_step_parse()
-		logger.info("Second step parse Successfully completed")
+		os.system("echo 'Second step parse Successfully completed' >> debug.log")
 
 
 

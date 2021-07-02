@@ -21,9 +21,9 @@ class Parser:
 		"""
 		proxies = {
 		# "https" : "178.32.116.64:3128",
-		"http" : '46.42.16.245:31565',
-		"socks4" : "188.235.34.146:1080",
-		"socks5" : "192.111.137.37:18762"
+		"http" : '51.79.249.253:8080',
+		"socks4" : "101.51.121.35:4153",
+		"socks5" : "98.162.96.52:4145"
 		}
 		urllib3.disable_warnings()
 		r = requests.get(url, headers=self.HEADER, params=params, proxies=proxies, verify=False)
@@ -97,7 +97,7 @@ class Parser:
 
 		Возвращает словарь с данными {date_publication, number_view, url}
 		"""
-		logger.add("Errors.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 MB")
+		#logger.add("Errors_parser.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 MB")
 		flag = True
 		while flag:
 			flag = False
@@ -116,11 +116,12 @@ class Parser:
 				    pass
 				try:
 					number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
+					date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
 				except AttributeError as error_atr:
-					logger.error(error_atr)
+					#logger.error(error_atr)
 					flag = True
 					continue
-				date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
+				
 				# Извлечение даты из декста
 				list_date = date_text.split(' ')
 				date_pub = list_date[-1].split('.')

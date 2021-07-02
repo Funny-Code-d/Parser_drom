@@ -1,24 +1,30 @@
+from aiogram import Bot, Dispatcher, executor, types
 from asyncio.events import TimerHandle
 from aiogram.types.inline_keyboard import InlineKeyboardButton
-from main_bot import bot, dp
+
 from aiogram.dispatcher.filters import Command, state
 from aiogram.types import Message
-from config import admin_id
+
 from aiogram.types import callback_query
 from aiogram import types
 from Question import Test
 from aiogram.dispatcher import FSMContext
-import sql_class
 
-# ---------------------------------------------------------------------------
+
+TOKEN = '867230989:AAGh1sKthkGz3QpwVgiXnllzPGiM9DzkJok'
+bot = Bot(TOKEN)
+dp = Dispatcher(bot)
+
+# @dp.message_handler()
+# async def echo(message: types.Message):
+# 	await message.answer(message.text)
+#------------------------------------------------------------------------------------------
 async def send_to_admin(dp):
-    await bot.send_message(chat_id=admin_id, text="Бот запущен")
+    await bot.send_message(chat_id='691263908', text="Бот запущен")
 
 async def send_to_admin_exit(dp):
-    await bot.send_message(chat_id=admin_id, text="Что то пошло не так... бот упал.")
-
-# -----------------------------------------------------------------------------
-
+    await bot.send_message(chat_id='691263908', text="Что то пошло не так... бот упал.")
+#------------------------------------------------------------------------------------------
 @dp.message_handler(Command("start_parser"), state=None)
 async def get_start(message : Message):
     markup_inline = types.InlineKeyboardMarkup(row_width=2)
@@ -88,13 +94,9 @@ async def answer2(call : callback_query, state: FSMContext):
     time_1 = InlineKeyboardButton(text='1 неделя', callback_data='one_week')
     time_2 = InlineKeyboardButton(text="2 недели", callback_data='two_week')
     time_3 = InlineKeyboardButton(text='1 Месяц', callback_data='month')
-    time_4 = InlineKeyboardButton(text="6 месяцев", callback_data='6_month')
-    time_5 = InlineKeyboardButton(text='12 месяцев', callback_data="12_month")
     time.append(time_1)
     time.append(time_2)
     time.append(time_3)
-    time.append(time_4)
-    time.append(time_5)
     
     for iter in time:
         markup_inline.insert(iter)
@@ -119,34 +121,17 @@ async def answer3(call : callback_query, state : FSMContext):
     elif answer3 == 'two_week':
         time = 'две недели'
     elif answer3 == 'month':
-        time = '1 месяц'
-    elif answer3 == "6_month":
-        time = "6 месяцев"
-    elif answer3 == "12_month":
-        time = '12 месяцев'
-
-    if answer1 == 'novosibirsk':
-        name_city = 'Новосибирск'
-    elif answer1 == 'irkutsk':
-        name_city = "Иркутск"
-    elif answer1 == "moscow":
-        name_city = 'Москва'
-    elif answer1 == "spb":
-        name_city = "Санкт-Петербург"
-    await call.message.answer(f'Город: {name_city}\nОтрезок времени: {time}\nЦеновой диапазон: {answer2}')
+        time = 'месяц'
+    await call.message.answer(f'Город: {answer1}\nОтрезок времени: {time}\nЦеновой диапазон: {answer2}')
     # await call.message.answer('https://s.auto.drom.ru/photo/pdfyQsaMz4R6JceHS-Y5NzTe3xEYzXph18GEpaXhWfjJBOFpN_A3HTxNUESXlx1UtZx2fT1MEh3ZXGNzwMRuPlKiVYw.jpg')
-    #!!!!!!!!!!!!!!!!!!!!!1
-    sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
-    table_rating = sql.select_for_telegram(answer3)
-    # with shelve.open(f'analisis/{answer1}/{answer2}/analisis.db') as file:
-    #     rating_list = file[answer3]
-    #     out_list = []
-    #     for item in range(10):
-    #         out_list.append(rating_list[item].output_to_telegram(item, answer3))
+    with shelve.open(f'analisis/{answer1}/{answer2}/analisis.db') as file:
+        rating_list = file[answer3]
+        out_list = []
+        for item in range(10):
+            out_list.append(rating_list[item].output_to_telegram(item, answer3))
         
-    #     for iteration in out_list:
-    #         await call.message.answer(iteration)
-    #!!!!!!!!!!!!!!!!!!!!!!
+        for iteration in out_list:
+            await call.message.answer(iteration)
     #----------------------------------------------------------------------------------------
     await state.finish()
     
@@ -165,3 +150,8 @@ async def get_info(message : Message):
 async def echo(message: Message):
     text = f"{message.text} - commands not found"
     await message.answer(text)
+#--------------------------------------------------------------------------------------------------
+
+
+if __name__ == "__main__":
+	executor.start_polling(dp, skip_updates=True, on_startup=send_to_admin, on_shutdown=send_to_admin_exit)
