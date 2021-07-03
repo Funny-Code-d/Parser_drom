@@ -11,7 +11,7 @@ from Question import Test
 from aiogram.dispatcher import FSMContext
 
 
-TOKEN = '867230989:AAGh1sKthkGz3QpwVgiXnllzPGiM9DzkJok'
+TOKEN = ''
 bot = Bot(TOKEN)
 dp = Dispatcher(bot)
 
