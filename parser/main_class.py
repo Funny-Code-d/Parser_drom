@@ -20,7 +20,7 @@ class Program:
 	Параметров для создания экземпляра не требуется
 	"""
 	def __init__(self, number_process):
-		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "192.168.0.200")
+		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
 		self.parser = parser_class.Parser()
 
 		if number_process == 1:
@@ -145,7 +145,7 @@ class Program:
 
 
 if __name__ == "__main__":
-	p = Program(sys.argv[1])
+	p = Program(int(sys.argv[1]))
 	if sys.argv[2] == 'first_step':
 		p.first_step_parse()
 	elif sys.argv[2] == 'swap':
