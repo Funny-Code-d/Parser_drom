@@ -49,8 +49,16 @@ class SQL_request:
 		except (Exception, psycopg2.DatabaseError) as error:
 			print(error)
 		return return_obj
+
+	def insert_to_db(self, req):
+		try:
+			self.cursor = self.conn.cursor()
+			self.cursor.execute(req, ())
+			self.cursor.close()
+		except (Exception, psycopg2.DatabaseError) as error:
+			print(error)
 # --------------------------------------------------------------------------------------------------------------
-	def select_url(self):
+	def select_url(self, city):
 
 		"""Метод для получения таблицы URL адресов
 
@@ -59,7 +67,7 @@ class SQL_request:
 		Возвращает таблицу"""
 
 		self.cursor = self.conn.cursor()
-		select = """SELECT url FROM advertisement WHERE number_view[2] = 0"""
+		select = f"""SELECT url FROM advertisement WHERE number_view[2] = 0 AND city = '{city}'"""
 		self.cursor.execute(select, ())
 		return_list = self.cursor.fetchall()
 		self.cursor.close()
@@ -227,9 +235,9 @@ class SQL_request:
 		month = now.month
 		year = now.year
 		date = f"{year}-{month}-{day}"
-		
-		insert = f"""INSERT INTO {table} (date_rating, place, average_view, model) VALUES ({date}, {place}, {average_price}, {model})"""
-		self.request_to_db(insert)
+
+		insert = f"""INSERT INTO {table} (date_rating, place, average_view, model) VALUES ('{date}', {place}, {average_price}, $${model}$$)"""
+		self.insert_to_db(insert)
 #-----------------------------------------------------------------------------------------------------------------------
 	def select_for_telegram(self, start):
 		pass

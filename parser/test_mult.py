@@ -19,21 +19,18 @@ class Program:
 	и вызвать метод run()
 	Параметров для создания экземпляра не требуется
 	"""
-	def __init__(self, number_process):
-		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "192.168.0.200")
+	def __init__(self, num):
+		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
 		self.parser = parser_class.Parser()
 
-		if number_process == 1:
-			self.city = ['novosibirsk']
-		elif number_process == 2:
-			self.city = ['irkutsk']
-		elif number_process == 3:
-			self.city = ['moscow']
+		self.city = ['novosibirsk', 'irkutsk', 'moscow', 'spb']
+		self.num = num
+		#self.categories = [[0, 100000], [100000, 200000], [200000, 500000], [500000, 900000], [900000, 1500000], [1500000, 2000000]]
+		if num == 1:
+			self.categories = [[0, 100000], [100000, 200000], [200000, 500000]]
 		else:
-			self.city = ['spb']
-		self.categories = [[0, 100000], [100000, 200000], [200000, 500000], [500000, 900000], [900000, 1500000], [1500000, 2000000]]
-
-		self.number_pages = 50
+			self.categories = [[500000, 900000], [900000, 1500000], [1500000, 2000000]]
+		self.number_pages = 1
 		#logger.add("debug.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 KB")
 
 
@@ -108,7 +105,12 @@ class Program:
 
 		"""
 		# Запрос всех объявлений
-		table_all_records = self.sql.select_url(self.city[0])
+		#table_all_records = self.sql.select_url()
+		if self.num == 1:
+			select = f"""SELECT url FROM advertisement WHERE price < 500000 AND number_view[2] = 0"""
+		else:
+			select = f"""SELECT url FROM advertisement WHERE price > 500000 AND number_view[2] = 0"""
+		table_all_records = self.sql.request_to_db(select)
 		index = 0
 		len_index = len(table_all_records)
 		# Цикл по полученой таблице из запроса
@@ -138,19 +140,19 @@ class Program:
 				print(error_atr)
 				continue
 
-	def swap(self):
+	def run(self):
+		print("First step parse:")
+		self.first_step_parse()
+		#logger.info("First step parse Successfully completed")
 		self.sql.before_update()
 
+		print("Second step parse: ")
+		self.try_second_step_parse()
+		os.system("echo 'Second step parse Successfully completed' >> debug.log")
 
 
 
 if __name__ == "__main__":
-	p = Program(sys.argv[1])
-	if sys.argv[2] == 'first_step':
-		p.first_step_parse()
-	elif sys.argv[2] == 'swap':
-		p.swap()
-	elif sys.argv[2] == 'second_step':
-		p.try_second_step_parse()
-	else:
-		print("Undefined problem")
+	p = Program(int(sys.argv[1]))
+	p.run()
+	#print(sys.argv[1])

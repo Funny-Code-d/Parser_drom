@@ -15,7 +15,7 @@ class Analysis:
 		for item in table:
 			# Если марка уже есть в словаре
 			if item[0] in cars.keys():
-				car[item[0]] += int(item[1])
+				cars[item[0]] += int(item[1])
 				number_pub_car[item[0]] += 1
 			# Если такой марки в словаре ещё нет
 			else:
@@ -32,6 +32,7 @@ class Analysis:
 		# Вставка/изменение записи в базе
 		for index, number in rating.iterrows():
 			self.sql.insert_after_analisis(name_table_for_insert, place, number["Model"], number["Average view"])
+			place += 1
 
 
 
@@ -54,7 +55,7 @@ class Analysis:
 		for item in range(len(range_time)):
 			select = f"SELECT model, average_view FROM rating WHERE date_rating > '{range_time[item].year}-{range_time[item].month}-{range_time[item].day}'"
 			table = self.sql.request_to_db(select)
-			self.run_analysis(tablem name_table[time])
+			self.run_analysis(table,name_table[item])
 
 if __name__ == "__main__":
 	a = Analysis()
