@@ -1,1 +1,0 @@
-python3 main_class.py 1 swap

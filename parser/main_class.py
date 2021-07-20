@@ -19,18 +19,18 @@ class Program:
 	и вызвать метод run()
 	Параметров для создания экземпляра не требуется
 	"""
-	def __init__(self, number_process):
+	def __init__(self):
 		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
 		self.parser = parser_class.Parser()
-
-		if number_process == 1:
-			self.city = ['novosibirsk']
-		elif number_process == 2:
-			self.city = ['irkutsk']
-		elif number_process == 3:
-			self.city = ['moscow']
-		else:
-			self.city = ['spb']
+		self.city = ['novosibirsk', 'irkutsk']
+		# if number_process == 1:
+		# 	self.city = ['novosibirsk']
+		# elif number_process == 2:
+		# 	self.city = ['irkutsk']
+		# elif number_process == 3:
+		# 	self.city = ['moscow']
+		# else:
+		# 	self.city = ['spb']
 		self.categories = [[0, 100000], [100000, 200000], [200000, 500000], [500000, 900000], [900000, 1500000], [1500000, 2000000]]
 
 		self.number_pages = 50
@@ -96,6 +96,7 @@ class Program:
 
 					# Разбор словаря с данными и запись в базу
 					self.insert_filed_to_base(dict_field_car)
+					print(dict_field_car)
 					# Отображение хода выполенния
 					self.process_monitoring(index, len_index)
 					index += 1
@@ -117,6 +118,7 @@ class Program:
 			url_publication = ones_publication[0]
 			# Запрос и сбор информации со страницы
 			dict_info_form_page_car = self.parser.get_info_page_field(url_publication)
+			print(dict_info_form_page_car)
 			# Если объявление удалили
 			if dict_info_form_page_car == 'delete':
 				self.sql.delete_url(url_publication)
@@ -141,16 +143,21 @@ class Program:
 	def swap(self):
 		self.sql.before_update()
 
-
+	def run(self):
+		#self.first_step_parse()
+		# self.swap()
+		self.second_step_parse()
 
 
 if __name__ == "__main__":
-	p = Program(int(sys.argv[1]))
-	if sys.argv[2] == 'first_step':
-		p.first_step_parse()
-	elif sys.argv[2] == 'swap':
-		p.swap()
-	elif sys.argv[2] == 'second_step':
-		p.try_second_step_parse()
-	else:
-		print("Undefined problem")
+	p = Program()
+	p.run()
+	# p = Program(int(sys.argv[1]))
+	# if sys.argv[2] == 'first_step':
+	# 	p.first_step_parse()
+	# elif sys.argv[2] == 'swap':
+	# 	p.swap()
+	# elif sys.argv[2] == 'second_step':
+	# 	p.try_second_step_parse()
+	# else:
+	# 	print("Undefined problem")
