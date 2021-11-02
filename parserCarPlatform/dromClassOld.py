@@ -24,6 +24,7 @@ class Parser:
 		"http" : '51.79.249.253:8080',
 		"socks4" : "101.51.121.35:4153",
 		"socks5" : "98.162.96.52:4145"
+		# "http" : '198.199.120.102:8080'
 		}
 		urllib3.disable_warnings()
 		r = requests.get(url, headers=self.HEADER, params=params, proxies=proxies, verify=False)
@@ -63,6 +64,8 @@ class Parser:
 				price = ''
 				for i in list_price:
 					price += i
+				price = price.replace(u'\xa0', '')
+				#print(int(price))
 				if 0 < int(price) <= 100000:
 					average_price = '0-100'
 				elif 100000 < int(price) <= 200000:
@@ -110,13 +113,15 @@ class Parser:
 			else:
 				try:
 				    check_delete_page = html.find("h1", class_="e18vbajn0").get_text(strip=True)
-				    if check_delete_page == 'Объявление удалено!':
+				    if check_delete_page in ['Объявление удалено!', 'Объявление не опубликовано.']:
+    				
 				        return "delete"
 				except AttributeError:
 				    pass
 				try:
-					number_view = int(html.find("div", class_="css-193s9zx").get_text(strip=True))
-					date_text = html.find("div", class_="css-pxeubi").get_text(strip=True)
+					number_view = int(html.find("div", class_="css-14wh0pm e1lm3vns0").get_text(strip=True))
+					print(number_view)
+					date_text = html.find("div", class_="css-pxeubi evnwjo70").get_text(strip=True)
 				except AttributeError as error_atr:
 					#logger.error(error_atr)
 					flag = True

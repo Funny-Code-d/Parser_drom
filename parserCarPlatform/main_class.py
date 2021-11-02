@@ -20,21 +20,14 @@ class Program:
 	Параметров для создания экземпляра не требуется
 	"""
 	def __init__(self):
-		self.sql = sql_class.SQL_request("drom", "parser_drom", "parser_drom", "localhost")
+		self.sql = sql_class.SQL_request("carbuy_db", "carbuy", "carbuy", "localhost")
 		self.parser = parser_class.Parser()
 		self.city = ['novosibirsk', 'irkutsk']
-		# if number_process == 1:
-		# 	self.city = ['novosibirsk']
-		# elif number_process == 2:
-		# 	self.city = ['irkutsk']
-		# elif number_process == 3:
-		# 	self.city = ['moscow']
-		# else:
-		# 	self.city = ['spb']
+
 		self.categories = [[0, 100000], [100000, 200000], [200000, 500000], [500000, 900000], [900000, 1500000], [1500000, 2000000]]
 
-		self.number_pages = 50
-		#logger.add("debug.log", format="|{time}---{level}---{message}|", level="DEBUG", rotation="10 KB")
+		self.number_pages = 5
+
 
 
 	def process_monitoring(self, index, len_index):
@@ -96,7 +89,7 @@ class Program:
 
 					# Разбор словаря с данными и запись в базу
 					self.insert_filed_to_base(dict_field_car)
-					print(dict_field_car)
+					#print(dict_field_car)
 					# Отображение хода выполенния
 					self.process_monitoring(index, len_index)
 					index += 1
@@ -116,9 +109,11 @@ class Program:
 		for ones_publication in table_all_records:
 			# Url ссылка на объявление
 			url_publication = ones_publication[0]
+			print(url_publication)
 			# Запрос и сбор информации со страницы
 			dict_info_form_page_car = self.parser.get_info_page_field(url_publication)
-			print(dict_info_form_page_car)
+			
+			#print(dict_info_form_page_car)
 			# Если объявление удалили
 			if dict_info_form_page_car == 'delete':
 				self.sql.delete_url(url_publication)
@@ -145,7 +140,7 @@ class Program:
 
 	def run(self):
 		#self.first_step_parse()
-		# self.swap()
+		#self.swap()
 		self.second_step_parse()
 
 
