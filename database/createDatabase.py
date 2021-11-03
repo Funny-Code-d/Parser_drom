@@ -1,6 +1,6 @@
-from baseClassSql import BaseSql
+import baseClassSql
 
-class CreateTablesClass(BaseSql):
+class CreateTablesClass(baseClassSql.BaseSql):
 
     def __init__(self, datebase_name, user_name, password_db, host_address):
         super().__init__(datebase_name, user_name, password_db, host_address)
@@ -163,3 +163,6 @@ class CreateTablesClass(BaseSql):
         
         for item in tables:
             self._insert_to_db(item)
+
+obj = CreateTablesClass('carbuy_db', 'carbuy', 'carbuy', 'localhost')
+obj.run()
