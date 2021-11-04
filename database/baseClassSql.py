@@ -1,8 +1,7 @@
 import psycopg2
-from abc import ABCMeta
 
 
-class BaseSql(metaclass=ABCMeta):
+class BaseSql:
 
     def __init__(self, datebase_name, user_name, password_db, host_address):
         self.database_name = datebase_name

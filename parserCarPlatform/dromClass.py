@@ -1,12 +1,15 @@
-from abstractClass import AbstractParser
+from .abstract.abstractClass import AbstractParser
 
 
 class dromClass(AbstractParser):
 
-    def getInfoFields(self, url, city):
+    def __init__(self, proxies, header):
+        super().__init__(proxies, header)
 
-        htmlText = self.getHtml(url, header={'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0', 'accept' : '*/*'})
-        
+    def getInfoFields(self, url):
+
+        htmlText = self.getHtml(url)
+
         if htmlText is None:
             return None
         
@@ -31,7 +34,6 @@ class dromClass(AbstractParser):
                 "model_car" : model_car,
                 "url" : href,
                 "price" : price,
-                "city" : city
             })
         return returnsList
         
@@ -68,6 +70,5 @@ class dromClass(AbstractParser):
         }
         return dict_info
 
-
-obj = dromClass()
-print(obj.getInfoPageField('https://angarsk.drom.ru/toyota/celica/44530474.html'))
+    def __call__(self):
+        return 'Объект класса dromClass'

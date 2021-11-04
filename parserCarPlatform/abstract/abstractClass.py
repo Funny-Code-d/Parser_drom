@@ -14,8 +14,12 @@ class AbstractParser(metaclass=ABCMeta):
     * getInfoFields() - метод для получения информации со страницы списка объявлений (Необходимо переопределить и написать свою логику извлечения ифнормации)
     * getInfoPageField() - метод для получения информации со страницы конкретного объявления (Необходимо переопредеить)
     """
+    def __init__(self, proxies, header):
+        self.proxies = proxies
+        self.header = header
 
-    def getHtml(self, url, proxies=None, params=None, header=None):
+
+    def getHtml(self, url):
         """
         Метод отправки GET запроса и в случае успеха (status_code: 200) возвращает html-код страницы
 
@@ -31,7 +35,7 @@ class AbstractParser(metaclass=ABCMeta):
 
         urllib3.disable_warnings()
         
-        r = getRequests(url, headers=header, params=params, proxies=proxies, verify=False)
+        r = getRequests(url, headers=self.header, params=None, proxies=self.proxies, verify=False)
         
         if r.status_code == 200:
             soup = BeautifulSoup(r.text, 'html.parser')
@@ -53,12 +57,14 @@ class AbstractParser(metaclass=ABCMeta):
                 'url' : string,
                 'price' : float,
                 'city' : string'
+ 
             },
             {
                 'model_car' : string,
                 'url' : string,
                 'price' : float,
                 'city' : string'
+
             },
             ...
         ]

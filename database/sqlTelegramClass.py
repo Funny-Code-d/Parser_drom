@@ -1,4 +1,4 @@
-from baseClassSql import BaseSql
+from .baseClassSql import BaseSql
 
 
 class TelegramSqlInterface(BaseSql):

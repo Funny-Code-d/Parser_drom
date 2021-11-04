@@ -1,7 +1,7 @@
 from database.sqlParserClass import ParserSqlInterface
 import env.envParser as envImports
 import os
-import logging
+import loguru
 
 class Creator:
 
@@ -10,7 +10,8 @@ class Creator:
         #print(self.listPlatrform)
         self.sqlClient = ParserSqlInterface('carbuy_db', 'carbuy', 'carbuy', 'localhost')
         self.cityNames = self.sqlClient.getCity()
-        self.logger = logging.getLogger("testLog.log")
+        loguru.logger.add("logs/Create_process.log", format='{time} | {level} | {message}')
+
 
 
 
@@ -18,4 +19,6 @@ class Creator:
         for platform in self.listPlatrform:
             for city in self.cityNames:
                 # os.system(f"python3 startParserPlatform.py {platform} {city}")
-                self.logger.warning(f"Запущен процесс {platform} {city}")
+                loguru.logger.error(f"Запущен процесс парсинга платформы {platform}, города {city}")
+
+

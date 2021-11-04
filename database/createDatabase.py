@@ -1,6 +1,6 @@
-import baseClassSql
+from .baseClassSql import BaseSql
 
-class CreateTablesClass(baseClassSql.BaseSql):
+class CreateTablesClass(BaseSql):
 
     def __init__(self, datebase_name, user_name, password_db, host_address):
         super().__init__(datebase_name, user_name, password_db, host_address)
@@ -25,7 +25,9 @@ class CreateTablesClass(baseClassSql.BaseSql):
         catalogPriceRange = """
             CREATE TABLE IF NOT EXISTS list_price_range (
                 id serial PRIMARY KEY,
-                range varchar(30) UNIQUE
+                range varchar(30) UNIQUE,
+                min_price_range integer,
+                max_price_range integer
             )
         """
 
@@ -44,8 +46,8 @@ class CreateTablesClass(baseClassSql.BaseSql):
 
         tableAds = """
             CREATE TABLE IF NOT EXISTS ads (
-                id serial PRIMARY KEY,
-                url text,
+                id serial,
+                url text PRIMARY KEY,
                 model varchar(50),
                 city varchar(30),
                 platform varchar(30),
@@ -164,5 +166,7 @@ class CreateTablesClass(baseClassSql.BaseSql):
         for item in tables:
             self._insert_to_db(item)
 
-obj = CreateTablesClass('carbuy_db', 'carbuy', 'carbuy', 'localhost')
-obj.run()
+
+if __name__ == "__main__":
+    obj = CreateTablesClass("carbuy_db", 'carbuy', 'carbuy', 'localhost')
+    obj.run()
