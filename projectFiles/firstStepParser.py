@@ -5,37 +5,33 @@
 """
 
 import sys
-import env.envParser as envImports
+from .env import envParser
 from loguru import logger
-from database.sqlParserClass import ParserSqlInterface
+from .database.sqlParserClass import ParserSqlInterface
 
 
 
-class Program:
+class FirstStep:
 
 
     def __init__(self, platform, city):
-        self.objectPlatform = envImports.objectPlatform[platform]
+        self.objectPlatform = envParser.objectPlatform[platform]
         self.namePlatform = platform
         self.city = city
-        self.header = envImports.headerUserAgent
-        self.proxies = envImports.proxies
+        self.header = envParser.headerUserAgent
+        self.proxies = envParser.proxies
         
         self.sqlClient = ParserSqlInterface(
-            envImports.databaseSettings['database'], 
-            envImports.databaseSettings['user'], 
-            envImports.databaseSettings['password'], 
-            envImports.databaseSettings['host'])
+            envParser.databaseSettings['database'], 
+            envParser.databaseSettings['user'], 
+            envParser.databaseSettings['password'], 
+            envParser.databaseSettings['host'])
         
         self.numberPages = 90
 
         logger.add("logs/" + platform + "_" +  city + '.log', format='{time} | {level} | {message}', level="DEBUG", rotation="10 MB", compression='zip')
 
 
-    
-    def createUrl(self, page, minPrice, maxPrice):
-        link = f"https://{self.city}.{self.namePlatform}.ru/auto/all/page{page}/?minprice={minPrice}&maxprice={maxPrice}"
-        return link
 
 
     def run(self):
@@ -46,28 +42,22 @@ class Program:
             maxPrice = tablePriceRange[priceRangeIndex][1]
             for page in range(self.numberPages):
 
-                link = self.createUrl(page, minPrice, maxPrice)
+                link = self.objectPlatform.createUrl(page, minPrice, maxPrice, self.city)
                 getData = self.objectPlatform.getInfoFields(link)
                 for indexRecord in range(len(getData)):
                     getData[indexRecord]['city'] = self.city
                     getData[indexRecord]['platform'] = self.namePlatform
                     getData[indexRecord]['price_range'] = str(int(minPrice/1000)) + '-' + str(int(maxPrice/1000))
+                    logger.debug(getData[indexRecord])
                 self.sqlClient.upSertFirstStep(getData)
 
 
 
 
-
-
-
-
-
-
 if __name__ == '__main__':
-    #namePlatform = sys.argv[0]
-    #nameCity = sys.argv[1]
-    namePlatform = 'drom'
-    nameCity = 'novosibirsk'
+    namePlatform = sys.argv[1]
+    nameCity = sys.argv[2]
+    
 
-    ObjectProgram = Program(namePlatform, nameCity)
+    ObjectProgram = FirstStep(namePlatform, nameCity)
     ObjectProgram.run()

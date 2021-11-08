@@ -30,10 +30,10 @@ class ParserSqlInterface(BaseSql):
         for record in getData:
             query = f"""
                 INSERT INTO ads (model, url, price, city, platform, price_range) VALUES 
-                    ('{record['model_car']}', '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}')
+                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}')
                     ON CONFLICT (url) 
                         DO UPDATE SET
-                            model = '{record['model_car']}',
+                            model = $${record['model_car']}$$,
                             price = {record['price']},
                             city = '{record['city']}',
                             platform = '{record['platform']}',

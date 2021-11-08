@@ -5,6 +5,7 @@ class dromClass(AbstractParser):
 
     def __init__(self, proxies, header):
         super().__init__(proxies, header)
+        self.namePlatform = "drom"
 
     def getInfoFields(self, url):
 
@@ -69,6 +70,10 @@ class dromClass(AbstractParser):
             "url" : url
         }
         return dict_info
+
+    def createUrl(self, page, minPrice, maxPrice, city):
+        link = f"https://{city}.{self.namePlatform}.ru/auto/all/page{page}/?minprice={minPrice}&maxprice={maxPrice}"
+        return link
 
     def __call__(self):
         return 'Объект класса dromClass'

@@ -85,3 +85,6 @@ class AbstractParser(metaclass=ABCMeta):
         """
         print("getInfoPageField")
 
+    @abstractmethod
+    def createUrl(self, page, minPrice, maxPrice, city):
+        pass
