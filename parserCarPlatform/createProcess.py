@@ -1,7 +1,7 @@
 print('test1')
-from ..database.sqlParserClass import ParserSqlInterface
+from database.sqlParserClass import ParserSqlInterface
 # import ..env.envParser as envImports
-from ..env.envParser import objectPlatform
+from env.envParser import objectPlatform
 import os
 import loguru
 
@@ -21,7 +21,7 @@ class Creator:
         for platform in self.listPlatrform:
             for city in self.cityNames:
                 print(os.system("pwd"))
-                os.system(f"python3 projectFiles/firstStepParser.py {platform} {city} &")
+                os.system(f"python3 firstStepParser.py {platform} {city} &")
                 loguru.logger.warning(f"Запущен процесс парсинга платформы {platform}, города {city}")
 
 

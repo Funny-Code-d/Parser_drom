@@ -5,9 +5,9 @@
 """
 
 import sys
-from .env import envParser
+from env import envParser
 from loguru import logger
-from .database.sqlParserClass import ParserSqlInterface
+from database.sqlParserClass import ParserSqlInterface
 
 
 

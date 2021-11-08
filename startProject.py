@@ -1,4 +1,4 @@
-from projectFiles.parserCarPlatform.createProcess import Creator
+from parserCarPlatform.createProcess import Creator
 
 obj = Creator()
 obj.run()

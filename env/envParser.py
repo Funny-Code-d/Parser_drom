@@ -1,4 +1,4 @@
-from ..parserCarPlatform.dromClass import dromClass
+from parserCarPlatform.dromClass import dromClass
 
 
 databaseSettings = {
