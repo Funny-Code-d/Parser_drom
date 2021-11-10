@@ -48,18 +48,18 @@ class dromClass(AbstractParser):
         try:
             check_delete_page = htmlText.find("h1", class_="e18vbajn0").get_text(strip=True)
             
-            if check_delete_page in ['Объявление удалено!', 'Объявление не опубликовано.']:
+            if check_delete_page in ('Объявление удалено!', 'Объявление не опубликовано.'):
                 return "Delete ads"
 
             number_view = int(htmlText.find("div", class_="css-14wh0pm e1lm3vns0").get_text(strip=True))
-            print(number_view)
+            #print(number_view)
             date_text = htmlText.find("div", class_="css-pxeubi evnwjo70").get_text(strip=True)
         
         except AttributeError:
             return "Attribute error"
 
 
-        # Извлечение даты из декста
+        # Извлечение даты из текста
         list_date = date_text.split(' ')
         date_pub = list_date[-1].split('.')
         date_publication = date_pub[2] + '-' + date_pub[1] + '-' + date_pub[0]

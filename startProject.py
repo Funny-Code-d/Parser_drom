@@ -1,4 +1,6 @@
 from parserCarPlatform.createProcess import Creator
-
-obj = Creator()
-obj.run()
+import sys
+if __name__ == '__main__':
+    typeStep = sys.argv[1]
+    obj = Creator(typeStep)
+    obj.run()

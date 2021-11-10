@@ -8,7 +8,7 @@ import sys
 from env import envParser
 from loguru import logger
 from database.sqlParserClass import ParserSqlInterface
-
+import datetime
 
 
 class FirstStep:
@@ -29,9 +29,11 @@ class FirstStep:
         
         self.numberPages = 90
 
-        logger.add("logs/" + platform + "_" +  city + '.log', format='{time} | {level} | {message}', level="DEBUG", rotation="10 MB", compression='zip')
+        logger.add("logs/" + platform + "_" +  city + "_firstStep" + '.log', format='{time} | {level} | {message}', level="DEBUG", rotation="10 MB", compression='zip')
 
-
+    def getNowDateSqlFormat(self):
+        now = datetime.datetime.now()
+        return f"{now.year}-{now.month}-{now.day}"
 
 
     def run(self):
@@ -48,6 +50,7 @@ class FirstStep:
                     getData[indexRecord]['city'] = self.city
                     getData[indexRecord]['platform'] = self.namePlatform
                     getData[indexRecord]['price_range'] = str(int(minPrice/1000)) + '-' + str(int(maxPrice/1000))
+                    getData[indexRecord]['date_getting'] = self.getNowDateSqlFormat()
                     logger.debug(getData[indexRecord])
                 self.sqlClient.upSertFirstStep(getData)
 

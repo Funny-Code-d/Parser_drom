@@ -1,5 +1,5 @@
 from .baseClassSql import BaseSql
-
+import datetime
 
 class ParserSqlInterface(BaseSql):
 
@@ -29,19 +29,52 @@ class ParserSqlInterface(BaseSql):
 
         for record in getData:
             query = f"""
-                INSERT INTO ads (model, url, price, city, platform, price_range) VALUES 
-                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}')
+                INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting) VALUES 
+                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}')
                     ON CONFLICT (url) 
                         DO UPDATE SET
                             model = $${record['model_car']}$$,
                             price = {record['price']},
                             city = '{record['city']}',
                             platform = '{record['platform']}',
-                            price_range = '{record['price_range']}'
+                            price_range = '{record['price_range']}',
+                            date_of_getting = '{record['date_getting']}'
             """
             self._insert_to_db(query)
+    
+
+    def UpdateSecondStep(self, getData):
+        
+        query = f"""
+            UPDATE ads SET date_publication = '{getData['date_publication']}', number_view = {getData['number_view']}
+                WHERE url = '{getData['url']}'
+
+        """
+        self._insert_to_db(query)
+
+    def getNowDateSqlFormat(self):
+        now = datetime.datetime.now()
+        return f"{now.year}-{now.month}-{now.day}"
+        
+
+    def getAdsForSecondStep(self, city, platform, offset, limit):
+        yesterday = self.getNowDateSqlFormat()
+        query = f"""
+            SELECT url FROM ads
+                WHERE city = '{city}' AND platform = '{platform}' AND date_of_getting = '{yesterday}' ORDER BY model
+                LIMIT {limit} OFFSET {offset}
+        """
+        
+        return self._get_table_from_db(query)
 
 
+    def getCountAdsForOffset(self, city, platform):
+
+        query = f"""
+            SELECT COUNT(*) FROM ads
+                WHERE city = '{city}' AND platform = '{platform}'
+        """
+        return self._get_table_from_db(query)[0][0]
 
 
 if __name__ == '__main__':
