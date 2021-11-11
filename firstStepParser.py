@@ -35,7 +35,7 @@ class FirstStep:
         now = datetime.datetime.now()
         return f"{now.year}-{now.month}-{now.day}"
 
-
+    @logger.catch
     def run(self):
         tablePriceRange = self.sqlClient.getPriceRange()
         for priceRangeIndex in range(len(tablePriceRange)):
@@ -46,12 +46,17 @@ class FirstStep:
 
                 link = self.objectPlatform.createUrl(page, minPrice, maxPrice, self.city)
                 getData = self.objectPlatform.getInfoFields(link)
+
+                if not isinstance(getData, list):
+                    logger.error("Error first step, getData not is list")
+                    continue
+                
                 for indexRecord in range(len(getData)):
                     getData[indexRecord]['city'] = self.city
                     getData[indexRecord]['platform'] = self.namePlatform
                     getData[indexRecord]['price_range'] = str(int(minPrice/1000)) + '-' + str(int(maxPrice/1000))
                     getData[indexRecord]['date_getting'] = self.getNowDateSqlFormat()
-                    logger.debug(getData[indexRecord])
+                
                 self.sqlClient.upSertFirstStep(getData)
 
 
@@ -63,4 +68,5 @@ if __name__ == '__main__':
     
 
     ObjectProgram = FirstStep(namePlatform, nameCity)
+    
     ObjectProgram.run()

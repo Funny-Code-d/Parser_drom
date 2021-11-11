@@ -50,6 +50,7 @@ class ParserSqlInterface(BaseSql):
                 WHERE url = '{getData['url']}'
 
         """
+        #print(query)
         self._insert_to_db(query)
 
     def getNowDateSqlFormat(self):

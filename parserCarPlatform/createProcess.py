@@ -18,13 +18,10 @@ class Creator:
             databaseSettings['host']
         )
         self.cityNames = self.sqlClient.getCity()
+        loguru.logger.add("logs/Create_process.log", format='{time} | {level} | {message}')
         self.typeStep = step
         self.error = False
-        if step == 'first':
-            loguru.logger.add("logs/Create_process_firstStep.log", format='{time} | {level} | {message}')
-        elif step == 'second':
-            loguru.logger.add("logs/Create_process_firstStep.log", format='{time} | {level} | {message}')
-        else:
+        if step not in ('first', 'second'):
             self.error = True
 
 
@@ -40,7 +37,7 @@ class Creator:
                 print(os.system("pwd"))
                 if self.typeStep == 'first':
                     os.system(f"python3 firstStepParser.py {platform} {city} &")
-                    loguru.logger.warning(f"Запущен процесс обновления данных по объявлениям платформы {platform}, города {city}")
+                    loguru.logger.warning(f"Запущен первый этап сбора информации для платформы {platform}, города {city}")
                 else:
                     os.system(f"python3 secondStepParser.py {platform} {city} &")
-                    loguru.logger.warning(f"Запущен процесс парсинга платформы {platform}, города {city}")
+                    loguru.logger.warning(f"Запущен второй этап сбора информации для платформы {platform}, города {city}")

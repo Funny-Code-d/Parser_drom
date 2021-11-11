@@ -40,6 +40,8 @@ class AbstractParser(metaclass=ABCMeta):
         if r.status_code == 200:
             soup = BeautifulSoup(r.text, 'html.parser')
             return soup
+        elif r.status_code == 404:
+            return '404'
         
         else:
             return None

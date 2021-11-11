@@ -28,7 +28,7 @@ class SecondStep:
 
         logger.add("logs/" + platform + "_" +  city + '_secondStep' + '.log', format='{time} | {level} | {message}', level="DEBUG", rotation="10 MB", compression='zip')
 
-    
+    @logger.catch
     def run(self):
         countAds = int(self.sqlClient.getCountAdsForOffset(self.city, self.namePlatform))
 
@@ -38,18 +38,20 @@ class SecondStep:
                 getData = self.objectPlatform.getInfoPageField(record[0])
                 # logger.info(getData)
                 if isinstance(getData, dict):
+                    #logger.info(getData)
                     self.sqlClient.UpdateSecondStep(getData)
                 elif getData == "Delete ads":
                     logger.error(f"Delete ads {record[0]}")
                 elif getData == 'Attribute error':
                     logger.error(f"Attribute error: {record[0]}")
                 else:
-                    logger.error(f"Uncnown errors: {getData}")
+                    logger.error(f"Uncnown errors: {record[0]}")
 
 
 if __name__ == '__main__':
-    nameCity = 'irkutsk'
-    namePlatform = 'drom'
-
+    #nameCity = 'irkutsk'
+    #namePlatform = 'drom'
+    namePlatform = sys.argv[1]
+    nameCity = sys.argv[2]
     obj = SecondStep(namePlatform, nameCity)
     obj.run()

@@ -13,6 +13,8 @@ class dromClass(AbstractParser):
 
         if htmlText is None:
             return None
+        elif htmlText == '404':
+            return 'Delete ads'
         
         fields = htmlText.find_all('a', class_='ewrty961')
         
@@ -44,6 +46,8 @@ class dromClass(AbstractParser):
 
         if htmlText is None:
             return None
+        elif htmlText == '404':
+            return 'Delete ads'
 
         try:
             check_delete_page = htmlText.find("h1", class_="e18vbajn0").get_text(strip=True)
