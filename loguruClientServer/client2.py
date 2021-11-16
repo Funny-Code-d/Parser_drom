@@ -22,4 +22,6 @@ class SocketHandler:
 
 logger.configure(handlers=[{"sink": SocketHandler('localhost', 9999)}])
 
-logger.info(f"Client 1")
+while 1:
+    time.sleep(5)
+    logger.info(f"Client 2")

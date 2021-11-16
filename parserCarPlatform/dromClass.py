@@ -1,22 +1,25 @@
 from .abstract.abstractClass import AbstractParser
-
-
+from env.error import ErrorsCodes
+from env.tagsParser import tagsForParse
 class dromClass(AbstractParser):
 
     def __init__(self, proxies, header):
         super().__init__(proxies, header)
         self.namePlatform = "drom"
+        self.tagsClass = tagsForParse.tags.value[self.namePlatform]
+
 
     def getInfoFields(self, url):
 
         htmlText = self.getHtml(url)
 
-        if htmlText is None:
-            return None
-        elif htmlText == '404':
-            return 'Delete ads'
+        if htmlText == ErrorsCodes.requestError:
+            return ErrorsCodes.requestError
+
+        elif htmlText == ErrorsCodes.deleteAction:
+            return ErrorsCodes.deleteAction
         
-        fields = htmlText.find_all('a', class_='ewrty961')
+        fields = htmlText.find_all('a', class_=self.tagsClass['fields'])
         
         returnsList = []
 
@@ -44,23 +47,33 @@ class dromClass(AbstractParser):
     def getInfoPageField(self, url):
         htmlText = self.getHtml(url)
 
-        if htmlText is None:
-            return None
-        elif htmlText == '404':
-            return 'Delete ads'
+        if htmlText == ErrorsCodes.requestError:
+            return ErrorsCodes.requestError
+
+        elif htmlText == ErrorsCodes.deleteAction:
+            return ErrorsCodes.deleteAction
+
+        # Проверка что машина не проданна
+        try:
+            if htmlText.find("span", class_=self.tagsClass['checkSoldCar']):
+                return ErrorsCodes.soldThisCar
+        except AttributeError:
+            pass
 
         try:
-            check_delete_page = htmlText.find("h1", class_="e18vbajn0").get_text(strip=True)
+            # Проверка что объявление ещё существует на сайте
+            check_delete_page = htmlText.find("h1", class_=self.tagsClass['checkDeletePage']).get_text(strip=True)
             
-            if check_delete_page in ('Объявление удалено!', 'Объявление не опубликовано.'):
-                return "Delete ads"
+            if check_delete_page in ErrorsCodes.listCheckDeleteAds.value:
+                return ErrorsCodes.deleteAction
 
-            number_view = int(htmlText.find("div", class_="css-14wh0pm e1lm3vns0").get_text(strip=True))
+            
+            number_view = int(htmlText.find("div", class_=self.tagsClass['numberView']).get_text(strip=True))
             #print(number_view)
-            date_text = htmlText.find("div", class_="css-pxeubi evnwjo70").get_text(strip=True)
+            date_text = htmlText.find("div", class_=self.tagsClass['datePublication']).get_text(strip=True)
         
         except AttributeError:
-            return "Attribute error"
+            return ErrorsCodes.requestError
 
 
         # Извлечение даты из текста

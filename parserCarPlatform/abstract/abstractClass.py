@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from requests.packages import urllib3
 from requests import get as getRequests
 from bs4 import BeautifulSoup
-
+from env.error import ErrorsCodes
 class AbstractParser(metaclass=ABCMeta):
 
     """
@@ -37,14 +37,14 @@ class AbstractParser(metaclass=ABCMeta):
         
         r = getRequests(url, headers=self.header, params=None, proxies=self.proxies, verify=False)
         
-        if r.status_code == 200:
+        if r.status_code == ErrorsCodes.requestOk.value:
             soup = BeautifulSoup(r.text, 'html.parser')
             return soup
-        elif r.status_code == 404:
-            return '404'
+        elif r.status_code == ErrorsCodes.notFound.value:
+            return ErrorsCodes.deleteAction
         
         else:
-            return None
+            return ErrorsCodes.requestError
     
 
 

@@ -18,7 +18,9 @@ class LoggingStreamHandler(socketserver.StreamRequestHandler):
                 chunk = chunk + self.connection.recv(slen - len(chunk))
             record = pickle.loads(chunk)
             level, message = record["level"], record["message"]
-            logger.patch(lambda record: record.update(record)).log(level, message)
+            logger.add('test.log')
+            # logger.patch(lambda record: record.update(record)).log(level.name, message)
+            logger.log(level.name, message)
 
 server = socketserver.TCPServer(('localhost', 9999), LoggingStreamHandler)
 server.serve_forever()

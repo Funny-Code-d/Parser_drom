@@ -37,8 +37,7 @@ class ParserSqlInterface(BaseSql):
                             price = {record['price']},
                             city = '{record['city']}',
                             platform = '{record['platform']}',
-                            price_range = '{record['price_range']}',
-                            date_of_getting = '{record['date_getting']}'
+                            price_range = '{record['price_range']}'
             """
             self._insert_to_db(query)
     
@@ -46,7 +45,7 @@ class ParserSqlInterface(BaseSql):
     def UpdateSecondStep(self, getData):
         
         query = f"""
-            UPDATE ads SET date_publication = '{getData['date_publication']}', number_view = {getData['number_view']}
+            UPDATE ads SET date_publication = '{getData['date_publication']}', number_view = {getData['number_view']}, update_status = true
                 WHERE url = '{getData['url']}'
 
         """
@@ -58,24 +57,57 @@ class ParserSqlInterface(BaseSql):
         return f"{now.year}-{now.month}-{now.day}"
         
 
-    def getAdsForSecondStep(self, city, platform, offset, limit):
+    def getAdsForSecondStep(self, city, platform, limit):
         yesterday = self.getNowDateSqlFormat()
         query = f"""
             SELECT url FROM ads
-                WHERE city = '{city}' AND platform = '{platform}' AND date_of_getting = '{yesterday}' ORDER BY model
-                LIMIT {limit} OFFSET {offset}
+                WHERE city = '{city}' AND platform = '{platform}' AND date_of_getting < '{yesterday}' AND update_status = false
+                LIMIT {limit}
         """
-        
         return self._get_table_from_db(query)
 
 
     def getCountAdsForOffset(self, city, platform):
-
+        todayDate = self.getNowDateSqlFormat()
         query = f"""
             SELECT COUNT(*) FROM ads
-                WHERE city = '{city}' AND platform = '{platform}'
+                WHERE city = '{city}' AND platform = '{platform}' AND date_of_getting < '{todayDate}'  AND update_status = false
         """
         return self._get_table_from_db(query)[0][0]
+
+    
+
+    def updateStatusToFalse(self, platform, city):
+
+        query = f"""
+            UPDATE ads SET update_status = false
+                WHERE platform = '{platform}' AND city = '{city}'
+        """
+
+        self._insert_to_db(query)
+
+    def moveToOldAds(self, url):
+    
+        query = f"""
+            SELECT model, platform, city, price_range, price, date_publication, number_view
+                FROM ads WHERE url = '{url}'
+        """
+        getOldAds = self._get_table_from_db(query)[0]
+        
+
+        todayDate = self.getNowDateSqlFormat()
+
+        query = f"""
+            INSERT INTO save_old_ads (model, platform, city, price_range, price, date_start_publication, date_end_publication, number_view)
+                VALUES ($${getOldAds[0]}$$, '{getOldAds[1]}', '{getOldAds[2]}', '{getOldAds[3]}', '{getOldAds[4]}', '{getOldAds[5]}', '{todayDate}', {getOldAds[6]})
+        """
+        self._insert_to_db(query)
+
+        query = f"""
+            DELETE FROM ads WHERE url = '{url}'
+        """
+        self._insert_to_db(query)
+
 
 
 if __name__ == '__main__':

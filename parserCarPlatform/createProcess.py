@@ -34,7 +34,6 @@ class Creator:
             exit()
         for platform in self.listPlatrform:
             for city in self.cityNames:
-                print(os.system("pwd"))
                 if self.typeStep == 'first':
                     os.system(f"python3 firstStepParser.py {platform} {city} &")
                     loguru.logger.warning(f"Запущен первый этап сбора информации для платформы {platform}, города {city}")
