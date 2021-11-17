@@ -45,18 +45,22 @@ class dromClass(AbstractParser):
         
 
     def getInfoPageField(self, url):
+        dict_info = dict()
+        dict_info['errors'] = None
         htmlText = self.getHtml(url)
 
         if htmlText == ErrorsCodes.requestError:
-            return ErrorsCodes.requestError
+            dict_info['errors'] = ErrorsCodes.requestError
+            return dict_info
 
         elif htmlText == ErrorsCodes.deleteAction:
-            return ErrorsCodes.deleteAction
+            dict_info['errors'] = ErrorsCodes.deleteAction
+            return dict_info
 
         # Проверка что машина не проданна
         try:
             if htmlText.find("span", class_=self.tagsClass['checkSoldCar']):
-                return ErrorsCodes.soldThisCar
+                dict_info['errors'] = ErrorsCodes.soldThisCar
         except AttributeError:
             pass
 
@@ -65,7 +69,8 @@ class dromClass(AbstractParser):
             check_delete_page = htmlText.find("h1", class_=self.tagsClass['checkDeletePage']).get_text(strip=True)
             
             if check_delete_page in ErrorsCodes.listCheckDeleteAds.value:
-                return ErrorsCodes.deleteAction
+                dict_info['errors'] = ErrorsCodes.listCheckDeleteAds
+                return dict_info
 
             
             number_view = int(htmlText.find("div", class_=self.tagsClass['numberView']).get_text(strip=True))
@@ -73,7 +78,7 @@ class dromClass(AbstractParser):
             date_text = htmlText.find("div", class_=self.tagsClass['datePublication']).get_text(strip=True)
         
         except AttributeError:
-            return ErrorsCodes.requestError
+            dict_info['errors'] = ErrorsCodes.requestError
 
 
         # Извлечение даты из текста
@@ -81,11 +86,9 @@ class dromClass(AbstractParser):
         date_pub = list_date[-1].split('.')
         date_publication = date_pub[2] + '-' + date_pub[1] + '-' + date_pub[0]
         # Словарь с извлечёнными данными
-        dict_info = {
-            "date_publication" : date_publication,
-            "number_view" : number_view,
-            "url" : url
-        }
+        dict_info['date_publication'] = date_publication
+        dict_info['number_view'] = number_view
+        dict_info['url'] = url
         return dict_info
 
     def createUrl(self, page, minPrice, maxPrice, city):

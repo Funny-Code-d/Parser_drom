@@ -5,6 +5,9 @@
 """
 
 import sys
+
+from requests.api import get
+from env.error import ErrorsCodes
 from env import envParser, error
 from loguru import logger
 from database.sqlParserClass import ParserSqlInterface
@@ -43,36 +46,36 @@ class SecondStep:
         tableWithRecords = self.sqlClient.getAdsForSecondStep(self.city, self.namePlatform, self.limitGetRecord)
         for record in tableWithRecords:
             getData = self.objectPlatform.getInfoPageField(record[0])
+            
 
             # Объявление удалено (ошибка 404)
-            if getData == error.ErrorsCodes.deleteAction:
+            if getData['errors'] == error.ErrorsCodes.deleteAction:
                 self.countDeleteRecords += 1
                 logger.debug(f"Объявление удалено: {record[0]}")
                 self.sqlClient.moveToOldAds(record[0])
             
-            # Ошибка запроса (будет проверенно повторно)
-            elif getData == error.ErrorsCodes.requestError:
-                logger.debug(f"Request errror {record[0]}")
-                continue
-
-            # Машина проданна
-            elif getData == error.ErrorsCodes.soldThisCar:
-                self.countDeleteRecords += 1
-                logger.debug(f"Машина продана: {record[0]}")
-                self.sqlClient.moveToOldAds(record[0])
-
-            # Всё ок
-            elif isinstance(getData, dict):
-                self.countUpdateRecords += 1
+            else:
+                # Ошибка запроса (будет проверенно повторно)
+                if getData['errors'] == error.ErrorsCodes.requestError:
+                    logger.error(f"Request errror {record[0]}")
+                    continue
+                
                 logger.debug(f"Обновленно: {record[0]}")
                 self.sqlClient.UpdateSecondStep(getData)
+                
+                # Машина проданна
+                
+                if getData['errors'] == error.ErrorsCodes.soldThisCar:
+                    self.countDeleteRecords += 1
+                    logger.debug(f"Машина продана: {record[0]}")
+                    self.sqlClient.moveToOldAds(record[0])
         
         ostRecords = int(self.sqlClient.getCountAdsForOffset(self.city, self.namePlatform))
-        logger.warning(f'Осталось записей: {ostRecords}')
+        logger.info(f'RUN --- {self.city} {self.namePlatform} --- Осталось записей: {ostRecords}')
         if ostRecords > 0:
             return self.run()
         else:
-            logger.critical(f"Обновленно: {self.countUpdateRecords}, Удалено {self.countDeleteRecords}")
+            logger.success(f"END --- {self.city} {self.namePlatform} --- Обновленно: {self.countUpdateRecords}, Удалено {self.countDeleteRecords}")
             return None
 
 

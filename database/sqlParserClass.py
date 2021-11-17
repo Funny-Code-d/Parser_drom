@@ -1,6 +1,6 @@
 from .baseClassSql import BaseSql
 import datetime
-
+from time import sleep
 class ParserSqlInterface(BaseSql):
 
     def __init__(self, datebase_name, user_name, password_db, host_address):
@@ -29,15 +29,16 @@ class ParserSqlInterface(BaseSql):
 
         for record in getData:
             query = f"""
-                INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting) VALUES 
-                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}')
+                INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting, update_status) VALUES 
+                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}', {record['update_status']})
                     ON CONFLICT (url) 
                         DO UPDATE SET
                             model = $${record['model_car']}$$,
                             price = {record['price']},
                             city = '{record['city']}',
                             platform = '{record['platform']}',
-                            price_range = '{record['price_range']}'
+                            price_range = '{record['price_range']}',
+                            update_status = {record['update_status']}
             """
             self._insert_to_db(query)
     
@@ -93,14 +94,19 @@ class ParserSqlInterface(BaseSql):
                 FROM ads WHERE url = '{url}'
         """
         getOldAds = self._get_table_from_db(query)[0]
-        
+
+        numberView = getOldAds[6]
+
+        if numberView is None:
+            numberView = 0        
 
         todayDate = self.getNowDateSqlFormat()
 
         query = f"""
             INSERT INTO save_old_ads (model, platform, city, price_range, price, date_start_publication, date_end_publication, number_view)
-                VALUES ($${getOldAds[0]}$$, '{getOldAds[1]}', '{getOldAds[2]}', '{getOldAds[3]}', '{getOldAds[4]}', '{getOldAds[5]}', '{todayDate}', {getOldAds[6]})
+                VALUES ($${getOldAds[0]}$$, '{getOldAds[1]}', '{getOldAds[2]}', '{getOldAds[3]}', '{getOldAds[4]}', '{getOldAds[5]}', '{todayDate}', {numberView})
         """
+
         self._insert_to_db(query)
 
         query = f"""

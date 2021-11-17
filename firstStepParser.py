@@ -56,6 +56,7 @@ class FirstStep:
                     getData[indexRecord]['platform'] = self.namePlatform
                     getData[indexRecord]['price_range'] = str(int(minPrice/1000)) + '-' + str(int(maxPrice/1000))
                     getData[indexRecord]['date_getting'] = self.getNowDateSqlFormat()
+                    getData[indexRecord]['update_status'] = False
                 
                 self.sqlClient.upSertFirstStep(getData)
 
