@@ -28,28 +28,46 @@ class ParserSqlInterface(BaseSql):
     def upSertFirstStep(self, getData):
 
         for record in getData:
+            # query = f"""
+            #     INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting, update_status) VALUES 
+            #         ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}', {record['update_status']})
+            #         ON CONFLICT (url) 
+            #             DO UPDATE SET
+            #                 model = $${record['model_car']}$$,
+            #                 price = {record['price']},
+            #                 city = '{record['city']}',
+            #                 platform = '{record['platform']}',
+            #                 price_range = '{record['price_range']}',
+            #                 update_status = {record['update_status']}
+            # """
             query = f"""
-                INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting, update_status) VALUES 
-                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}', {record['update_status']})
+                INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting, update_status, years) VALUES 
+                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}', {record['update_status']}, {record['years_car']})
                     ON CONFLICT (url) 
-                        DO UPDATE SET
-                            model = $${record['model_car']}$$,
-                            price = {record['price']},
-                            city = '{record['city']}',
-                            platform = '{record['platform']}',
-                            price_range = '{record['price_range']}',
-                            update_status = {record['update_status']}
+                        DO NOTHING
             """
             self._insert_to_db(query)
     
 
     def UpdateSecondStep(self, getData):
-        
-        query = f"""
-            UPDATE ads SET date_publication = '{getData['date_publication']}', number_view = {getData['number_view']}, update_status = true
-                WHERE url = '{getData['url']}'
 
-        """
+        # date_publication = '{getData['date_publication']}', number_view = {getData['number_view']}, update_status = true,
+        # motor = $${getData['motor']}$$,
+        # motorPower = $${getData['motorPower']}$$,
+        # transmisson = $${getData['transmisson']}$$,
+        # drive = $${getData['drive']}$$,
+        # mileage = $${getData['mileage']}$$,
+        # wheel = $${getData['wheel']}$$,
+        # bodyType = $${getData['bodyType']}$$,
+        # generation = $${getData['generation']}$$
+
+
+        query = f"UPDATE ads SET  number_view = {getData['number_view']}"
+        for attribute in getData.keys():
+            if attribute is not None and attribute != 'number_view' and attribute != 'errors':
+                query += f", {attribute} = $${getData[attribute]}$$"
+        query += f", update_status = true WHERE url = '{getData['url']}'"
+
         #print(query)
         self._insert_to_db(query)
 
@@ -59,20 +77,18 @@ class ParserSqlInterface(BaseSql):
         
 
     def getAdsForSecondStep(self, city, platform, limit):
-        yesterday = self.getNowDateSqlFormat()
         query = f"""
             SELECT url FROM ads
-                WHERE city = '{city}' AND platform = '{platform}' AND date_of_getting < '{yesterday}' AND update_status = false
+                WHERE city = '{city}' AND platform = '{platform}' AND update_status = false
                 LIMIT {limit}
         """
         return self._get_table_from_db(query)
 
 
     def getCountAdsForOffset(self, city, platform):
-        todayDate = self.getNowDateSqlFormat()
         query = f"""
             SELECT COUNT(*) FROM ads
-                WHERE city = '{city}' AND platform = '{platform}' AND date_of_getting < '{todayDate}'  AND update_status = false
+                WHERE city = '{city}' AND platform = '{platform}'  AND update_status = false
         """
         return self._get_table_from_db(query)[0][0]
 
@@ -94,6 +110,16 @@ class ParserSqlInterface(BaseSql):
                 FROM ads WHERE url = '{url}'
         """
         getOldAds = self._get_table_from_db(query)[0]
+
+        # если не было получено даты публикаци, а объявление уже удалили => просто удалить, без переноса
+        datePublication = getOldAds[5]
+        if datePublication is None:
+            query = f"""
+                DELETE FROM ads WHERE url = '{url}'
+            """
+            self._insert_to_db(query)
+            return None
+
 
         numberView = getOldAds[6]
 

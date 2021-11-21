@@ -8,6 +8,9 @@ config.py
 
 .vs
 
+logs/
+
+
 # Distribution / packaging
 .Python
 build/

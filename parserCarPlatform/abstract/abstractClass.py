@@ -36,7 +36,6 @@ class AbstractParser(metaclass=ABCMeta):
         urllib3.disable_warnings()
         
         r = getRequests(url, headers=self.header, params=None, proxies=self.proxies, verify=False)
-        
         if r.status_code == ErrorsCodes.requestOk.value:
             soup = BeautifulSoup(r.text, 'html.parser')
             return soup
@@ -49,7 +48,7 @@ class AbstractParser(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def getInfoFields(self):
+    def getInfoListCar(self):
         """
         Метод должен возвращать список словарей формата:
 
@@ -75,7 +74,7 @@ class AbstractParser(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def getInfoPageField(self):
+    def getInfoPageCar(self):
         """
         Метод должен возвращать словарь формата:
 
