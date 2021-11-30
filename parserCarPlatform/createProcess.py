@@ -36,7 +36,10 @@ class Creator:
             for city in self.cityNames:
                 if self.typeStep == 'first':
                     os.system(f"python3 firstStepParser.py {platform} {city} &")
-                    loguru.logger.warning(f"Запущен первый этап сбора информации для платформы {platform}, города {city}")
                 else:
                     os.system(f"python3 secondStepParser.py {platform} {city} &")
-                    loguru.logger.warning(f"Запущен второй этап сбора информации для платформы {platform}, города {city}")
+        
+        if self.typeStep == 'first':
+            loguru.logger.info(f"Запущен первый этап сбора информации")
+        else:
+            loguru.logger.info(f"Запущен второй этап сбора информации")

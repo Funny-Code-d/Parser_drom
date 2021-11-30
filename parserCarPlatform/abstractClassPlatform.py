@@ -3,6 +3,8 @@ from requests.packages import urllib3
 from requests import get as getRequests
 from bs4 import BeautifulSoup
 from env.error import ErrorsCodes
+
+
 class AbstractParser(metaclass=ABCMeta):
 
     """
@@ -49,42 +51,12 @@ class AbstractParser(metaclass=ABCMeta):
 
     @abstractmethod
     def getInfoListCar(self):
-        """
-        Метод должен возвращать список словарей формата:
-
-        [
-            {
-                'model_car' : string,
-                'url' : string,
-                'price' : float,
-                'city' : string'
- 
-            },
-            {
-                'model_car' : string,
-                'url' : string,
-                'price' : float,
-                'city' : string'
-
-            },
-            ...
-        ]
-        """
-        print("getInfoFields")
+        pass
 
 
     @abstractmethod
     def getInfoPageCar(self):
-        """
-        Метод должен возвращать словарь формата:
-
-        {
-            'date_publication' : datetime (module Python),
-            'number_view' : integer,
-            'url' : string'
-        }
-        """
-        print("getInfoPageField")
+        pass
 
     @abstractmethod
     def createUrl(self, page, minPrice, maxPrice, city):

@@ -1,5 +1,5 @@
 import psycopg2
-
+import psycopg2.extras
 
 class BaseSql:
 
@@ -34,6 +34,33 @@ class BaseSql:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
         return return_obj
+    
+    def _getOneRecordDict(self, req):
+        try:
+            self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.cursor.execute(req, ())
+            getData = self.cursor.fetchone()
+            return dict(getData)
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            return None
+
+
+    def _getRecordsDict(self, req):
+        try:
+            self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.cursor.execute(req, ())
+            returnList = list()
+            while True:
+                record = self.cursor.fetchone()
+                if record is None:
+                    break
+                else:
+                    returnList.append(dict(record))
+            return returnList
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            return None
 
     def _insert_to_db(self, req):
         try:

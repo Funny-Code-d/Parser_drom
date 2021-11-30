@@ -54,7 +54,7 @@ class SecondStep:
             # Объявление удалено (ошибка 404)
             if getData['errors'] == error.ErrorsCodes.deleteAction:
                 self.countDeleteRecords += 1
-                logger.warning(f"Объявление удалено: {record[0]}")
+                # logger.warning(f"Объявление удалено: {record[0]}")
                 self.sqlClient.moveToOldAds(record[0])
             
             else:
@@ -64,8 +64,8 @@ class SecondStep:
                     logger.error(getData)
                     continue
                 
-                logger.debug(f"Обновленно: {record[0]}")
-                logger.debug(getData)
+                # logger.debug(f"Обновленно: {record[0]}")
+                # logger.debug(getData)
                 self.sqlClient.UpdateSecondStep(getData)
                 self.countUpdateRecords += 1
                 
@@ -73,11 +73,11 @@ class SecondStep:
                 
                 if getData['errors'] == error.ErrorsCodes.soldThisCar:
                     self.countDeleteRecords += 1
-                    logger.warning(f"Машина продана: {record[0]}")
+                    # logger.warning(f"Машина продана: {record[0]}")
                     self.sqlClient.moveToOldAds(record[0])
                     self.countUpdateRecords -= 1
         
-        ostRecords = int(self.sqlClient.getCountAdsForOffset(self.city, self.namePlatform))
+        ostRecords = int(self.sqlClient.getCountAdsForOffset(self.city, self.namePlatform, 'ads'))
         #logger.info(f'RUN --- {self.city} {self.namePlatform} --- Осталось записей: {ostRecords}')
         if ostRecords > 0:
             self.countRecursion += 1

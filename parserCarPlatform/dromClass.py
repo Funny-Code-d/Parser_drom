@@ -1,4 +1,4 @@
-from .abstract.abstractClass import AbstractParser
+from .abstractClassPlatform import AbstractParser
 from env.error import ErrorsCodes
 from env.tagsParser import tagsForParse
 from time import sleep
@@ -34,7 +34,7 @@ class dromClass(AbstractParser):
         elif key == 'Мощность':
             return 'motorPower', value
         elif key == 'Трансмиссия':
-            return 'transmisson', value
+            return 'transmission', value
         elif key == 'Привод':
             return 'drive', value
         elif key == 'Цвет':
@@ -85,7 +85,6 @@ class dromClass(AbstractParser):
                 "price" : price,
                 'years_car' : yearsCar
             })
-        print(returnsList)
         return returnsList
         
 

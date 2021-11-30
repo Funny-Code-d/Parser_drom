@@ -25,42 +25,31 @@ class ParserSqlInterface(BaseSql):
 
         return self._get_table_from_db(query)
 
-    def upSertFirstStep(self, getData):
+
+    # Добавление новых объявлений во временную таблицу
+    def insertRecordSkipConflict(self, getData, nameTable):
 
         for record in getData:
-            # query = f"""
-            #     INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting, update_status) VALUES 
-            #         ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}', {record['update_status']})
-            #         ON CONFLICT (url) 
-            #             DO UPDATE SET
-            #                 model = $${record['model_car']}$$,
-            #                 price = {record['price']},
-            #                 city = '{record['city']}',
-            #                 platform = '{record['platform']}',
-            #                 price_range = '{record['price_range']}',
-            #                 update_status = {record['update_status']}
-            # """
-            query = f"""
-                INSERT INTO ads (model, url, price, city, platform, price_range, date_of_getting, update_status, years) VALUES 
-                    ($${record['model_car']}$$, '{record['url']}', {record['price']}, '{record['city']}', '{record['platform']}', '{record['price_range']}', '{record['date_getting']}', {record['update_status']}, {record['years_car']})
-                    ON CONFLICT (url) 
-                        DO NOTHING
-            """
-            self._insert_to_db(query)
+
+            query = f"SELECT * FROM ads WHERE url = '{record['url']}'"
+
+            result = self._get_table_from_db(query)
+
+            if len(result) == 0:
+
+                query = f"""
+                    INSERT INTO {nameTable} (model, url, price, city, platform, date_of_getting, years, update_status) VALUES
+                        ($${record['model_car']}$$, $${record['url']}$$, {record['price']}, $${record['city']}$$,
+                        $${record['platform']}$$, $${record['date_getting']}$$, $${record['years_car']}$$, $${record['update_status']}$$)
+                            ON CONFLICT (url) DO NOTHING
+                """
+                self._insert_to_db(query)
+            else:
+                continue
+
     
 
     def UpdateSecondStep(self, getData):
-
-        # date_publication = '{getData['date_publication']}', number_view = {getData['number_view']}, update_status = true,
-        # motor = $${getData['motor']}$$,
-        # motorPower = $${getData['motorPower']}$$,
-        # transmisson = $${getData['transmisson']}$$,
-        # drive = $${getData['drive']}$$,
-        # mileage = $${getData['mileage']}$$,
-        # wheel = $${getData['wheel']}$$,
-        # bodyType = $${getData['bodyType']}$$,
-        # generation = $${getData['generation']}$$
-
 
         query = f"UPDATE ads SET  number_view = {getData['number_view']}"
         for attribute in getData.keys():
@@ -68,7 +57,6 @@ class ParserSqlInterface(BaseSql):
                 query += f", {attribute} = $${getData[attribute]}$$"
         query += f", update_status = true WHERE url = '{getData['url']}'"
 
-        #print(query)
         self._insert_to_db(query)
 
     def getNowDateSqlFormat(self):
@@ -85,9 +73,9 @@ class ParserSqlInterface(BaseSql):
         return self._get_table_from_db(query)
 
 
-    def getCountAdsForOffset(self, city, platform):
+    def getCountAdsForOffset(self, city, platform, nameTable):
         query = f"""
-            SELECT COUNT(*) FROM ads
+            SELECT COUNT(*) FROM {nameTable}
                 WHERE city = '{city}' AND platform = '{platform}'  AND update_status = false
         """
         return self._get_table_from_db(query)[0][0]
@@ -139,7 +127,96 @@ class ParserSqlInterface(BaseSql):
             DELETE FROM ads WHERE url = '{url}'
         """
         self._insert_to_db(query)
+    
 
+    def getNewRecord(self, city, platform, nameTable):
+
+        query = f"SELECT url FROM {nameTable} WHERE city = '{city}' AND platform = '{platform}' AND update_status = 'f' LIMIT 100"
+
+        table = self._getRecordsDict(query)
+        return table 
+    
+    def _createInsertQuery(self, nameTable, getDict):
+        query = f'INSERT INTO {nameTable} '
+
+        keyList = '('
+        valueList = '('
+
+        for attribute in getDict.keys():
+            if getDict[attribute] is not None and attribute != 'id':
+                keyList += f"{attribute},"
+
+                if isinstance(getDict[attribute], int) or isinstance(getDict[attribute], bool):
+                    valueList += f'{getDict[attribute]},'
+                else:
+                    valueList += f'$${getDict[attribute]}$$,'
+            else:
+                continue
+        
+        keyList = keyList[:-1]
+        valueList = valueList[:-1]
+
+        query += keyList
+
+        query += ") VALUES "
+
+        query += valueList
+
+        query += ") ON CONFLICT (url) DO NOTHING "
+
+        return query
+    
+    def _createUpdateQuery(self, nameTable, getDict):
+
+        query = f"UPDATE {nameTable} SET date_publication = $${getDict['date_publication']}$$ "
+
+        for record in getDict.keys():
+            
+            if record == 'errors' or record == 'url' or record is None or record == 'date_publication':
+                continue
+            
+            if isinstance(getDict[record], str):
+                query += f", {record} = $${getDict[record]}$$ "
+            elif isinstance(getDict[record], int) or isinstance(getDict[record], bool):
+                query += f", {record} = {getDict[record]} "
+        query += f" WHERE url = $${getDict['url']}$$"
+        return query
+
+    def updateRecord(self, getData, nameTable):
+
+        query = self._createUpdateQuery(nameTable, getData)
+
+        self._insert_to_db(query)
+
+
+
+    def moveToAds(self, record, nameTableFrom, nameTableTo):
+
+        query = f"SELECT * FROM {nameTableFrom} WHERE url = $${record['url']}$$"
+
+        getData = self._getOneRecordDict(query)
+
+        query = self._createInsertQuery(nameTableTo, getData)
+
+        self._insert_to_db(query)
+
+        query = f"DELETE FROM {nameTableFrom} WHERE url = $${record['url']}$$"
+
+        self._insert_to_db(query)
+    
+
+
+    def getCountNewAds(self, platform, city):
+        
+        query = f"SELECT COUNT(*) FROM notice_of_publication WHERE city = '{city}' AND platform = '{platform}'"
+
+        count = self._getOneRecordDict(query)
+
+        return count['count']
+    
+    def deleteRecord(self, nameTable, record):
+        query = f"DELETE FROM {nameTable} WHERE url = $${record['url']}$$"
+        self._insert_to_db(query)
 
 
 if __name__ == '__main__':

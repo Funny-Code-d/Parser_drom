@@ -1,4 +1,4 @@
-from .baseClassSql import BaseSql
+from baseClassSql import BaseSql
 
 class CreateTablesClass(BaseSql):
 
@@ -38,7 +38,7 @@ class CreateTablesClass(BaseSql):
             )
         """
 
-        return [catalogCity, catalogPlatform, catalogPriceRange, catalogTypeAgregation]
+        return (catalogCity, catalogPlatform, catalogPriceRange, catalogTypeAgregation)
     
 
 
@@ -56,6 +56,17 @@ class CreateTablesClass(BaseSql):
                 price_range varchar(30),
                 date_publication date,
                 date_of_getting date,
+                update_status bool,
+                years varchar(30),
+                color varchar(30),
+                motor varchar(30),
+                motorPower varchar(30),
+                transmission varchar(30),
+                drive varchar(30),
+                mileage varchar(30),
+                wheel varchar(30),
+                bodyType varchar(30),
+                generation varchar(30),
                 
                 FOREIGN KEY (city)
                     REFERENCES list_city(name_city)
@@ -130,12 +141,48 @@ class CreateTablesClass(BaseSql):
                 number_view integer,
                 price_range varchar(30),
                 date_start_publication date,
-                date_end_publication date
+                date_end_publication date,
+                years varchar(30),
+                color varchar(30),
+                motor varchar(30),
+                motorPower varchar(30),
+                transmission varchar(30),
+                drive varchar(30),
+                mileage varchar(30),
+                wheel varchar(30),
+                bodyType varchar(30),
+                generation varchar(30)
+            )
+        """
+
+        noticeOfPublication = """
+            CREATE TABLE IF NOT EXISTS notice_of_publication (
+                id serial,
+                url text PRIMARY KEY,
+                model varchar(50),
+                city varchar(30),
+                platform varchar(30),
+                price float,
+                number_view integer,
+                price_range varchar(30),
+                date_publication date,
+                date_of_getting date,
+                update_status bool,
+                years varchar(30),
+                color varchar(30),
+                motor varchar(30),
+                motorPower varchar(30),
+                transmission varchar(30),
+                drive varchar(30),
+                mileage varchar(30),
+                wheel varchar(30),
+                bodyType varchar(30),
+                generation varchar(30)
             )
         """
         
 
-        return [tableAds, tableAnalysis, tableNumberModel, tableOldAds]
+        return (tableAds, tableAnalysis, tableNumberModel, tableOldAds, noticeOfPublication)
     
     def dropTables(self):
         dropList = [
