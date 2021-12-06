@@ -17,29 +17,36 @@ class SecondStep:
 
 
     def __init__(self, platform, city):
-
+        # атрибуты для отслеживания обновления базы
         self.countUpdateRecords = 0
         self.countDeleteRecords = 0
         self.countRecursion = 0
+
+        # объект платформы для парсинга
         self.objectPlatform = envParser.objectPlatform[platform]
+        # информция о запущенном процессе (платформа и город)
         self.namePlatform = platform
         self.city = city
+        # header для метода get модуля requests
         self.header = envParser.headerUserAgent
+        # прокси сервера для метода get
         self.proxies = envParser.proxies
+        # количество записей к обновлению за один запрос к базе
         self.limitGetRecord = 100
+        # подключение к базе
         self.sqlClient = ParserSqlInterface(
             envParser.databaseSettings['database'], 
             envParser.databaseSettings['user'], 
             envParser.databaseSettings['password'], 
             envParser.databaseSettings['host'])
         
+        # настрйоки логирования
+        logger.add("logs/Report.log", format='{time} | {level} | {message}', level="DEBUG", rotation="2 MB", compression='zip')
 
-        logger.add("logs/" + platform + "_" +  city + '_secondStep' + '.log', format='{time} | {level} | {message}', rotation="10 MB", compression='zip', level='INFO')
-
-
+    # смена статуса сообщающего об обсновлении записи
     def switchUpdateStatusRecords(self):
         self.sqlClient.updateStatusToFalse(self.namePlatform, self.city)
-
+    # сведения о количестве обновленных/удаленных записях
     def getCountEndProgram(self):
         return (self.countUpdateRecords, self.countDeleteRecords, self.countRecursion)
 
@@ -61,7 +68,6 @@ class SecondStep:
                 # Ошибка запроса (будет проверенно повторно)
                 if getData['errors'] == error.ErrorsCodes.requestError:
                     logger.error(f"Request errror {record[0]}")
-                    logger.error(getData)
                     continue
                 
                 # logger.debug(f"Обновленно: {record[0]}")
@@ -106,4 +112,3 @@ if __name__ == '__main__':
         logger.add('logs/Create_process.log')
         tupleCount = obj.getCountEndProgram()
         logger.success(f"Программа успешно завершилась. Обновленно: {tupleCount[0]}   Удалено: {tupleCount[1]}")
-        logger.success(f"В ходе работы программы рекурсивно функция run была вызванна {tupleCount[2]} раз")

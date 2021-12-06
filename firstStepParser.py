@@ -33,7 +33,7 @@ class FirstStep:
         
         self.numberPages = 30
 
-        logger.add("logs/Create_process.log", format='{time} | {level} | {message}', level="DEBUG", rotation="10 MB", compression='zip')
+        logger.add("logs/Report.log", format='{time} | {level} | {message}', level="DEBUG", rotation="2 MB", compression='zip')
 
 
 
@@ -101,7 +101,7 @@ class FirstStep:
         # Фильтр webhooks и перемещение в таблицу ads
         self.webhookFilterAndMoveToAds()
         # запись в лог файл
-        logger.info(f"Первый этап завершён: | {self.city} | {self.namePlatform} | {countNewAds} новых объявлений")
+        logger.success(f"Первый этап завершён: | {self.city} | {self.namePlatform} | {countNewAds} новых объявлений")
         
 
 

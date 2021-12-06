@@ -18,7 +18,8 @@ class Creator:
             databaseSettings['host']
         )
         self.cityNames = self.sqlClient.getCity()
-        loguru.logger.add("logs/Create_process.log", format='{time} | {level} | {message}')
+        loguru.logger.add("logs/Report.log", format='{time} | {level} | {message}', level="DEBUG", rotation="2 MB", compression='zip')
+
         self.typeStep = step
         self.error = False
         if step not in ('first', 'second'):

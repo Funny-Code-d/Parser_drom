@@ -218,6 +218,17 @@ class ParserSqlInterface(BaseSql):
         query = f"DELETE FROM {nameTable} WHERE url = $${record['url']}$$"
         self._insert_to_db(query)
 
+    def getPercentageBase(self):
+        
+        query = """
+            WITH
+                table1 AS 
+                    (SELECT city,  COUNT(*) as c FROM ads GROUP BY city), 
+                table2 AS 
+                    (SELECT COUNT(*) as o FROM ads)
+                SELECT city, c, ((c/o::float*100)::integer)::text || ' %' as percent FROM table1, table2
+        """
+
 
 if __name__ == '__main__':
     obj = ParserSqlInterface('carbuy_db', 'carbuy', 'carbuy', 'localhost')
